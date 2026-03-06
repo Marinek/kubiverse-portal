@@ -1,8 +1,24 @@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Container, GitBranch, Shield } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <footer className="bg-card border-t">
       <div className="container mx-auto px-4 py-12">
@@ -18,7 +34,7 @@ export const Footer = () => {
               </div>
             </div>
             <p className="text-muted-foreground max-w-md mb-4">
-              Moderne Kubernetes-basierte Deployment-Plattform für Formularmanagement-Projekte 
+              Moderne Kubernetes-basierte Deployment-Plattform für Formularmanagement-Projekte
               mit automatisierter CI/CD-Integration und skalierbare Testumgebungen.
             </p>
             <div className="flex flex-wrap gap-2">
@@ -40,10 +56,10 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Plattform</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#kubiverse" className="hover:text-primary transition-colors">Was ist das Kubiverse?</a></li>
-              <li><a href="#deployment" className="hover:text-primary transition-colors">Deployment-Guide</a></li>
-              <li><a href="#documentation" className="hover:text-primary transition-colors">Dokumentation</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">System-Status</a></li>
+              <li><a href="#kubiverse" onClick={(e) => scrollTo(e, 'kubiverse')} className="hover:text-primary transition-colors cursor-pointer">Was ist das Kubiverse?</a></li>
+              <li><a href="#deployment" onClick={(e) => scrollTo(e, 'deployment')} className="hover:text-primary transition-colors cursor-pointer">Deployment-Guide</a></li>
+              <li><a href="#documentation" onClick={(e) => scrollTo(e, 'documentation')} className="hover:text-primary transition-colors cursor-pointer">Dokumentation</a></li>
+              <li><span className="hover:text-primary transition-colors cursor-pointer">System-Status</span></li>
             </ul>
           </div>
 

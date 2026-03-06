@@ -1,8 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { LayoutGrid } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export const Header = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
@@ -18,13 +33,13 @@ export const Header = () => {
           </div>
 
           <nav className="hidden md:flex items-center space-x-6">
-            <a href="/#kubiverse" className="text-sm font-medium hover:text-primary transition-colors">
+            <a href="#kubiverse" onClick={(e) => scrollTo(e, 'kubiverse')} className="text-sm font-medium hover:text-primary transition-colors cursor-pointer">
               Was ist das Kubiverse?
             </a>
-            <a href="/#deployment" className="text-sm font-medium hover:text-primary transition-colors">
+            <a href="#deployment" onClick={(e) => scrollTo(e, 'deployment')} className="text-sm font-medium hover:text-primary transition-colors cursor-pointer">
               Projekt veröffentlichen
             </a>
-            <a href="#documentation" className="text-sm font-medium hover:text-primary transition-colors">
+            <a href="#documentation" onClick={(e) => scrollTo(e, 'documentation')} className="text-sm font-medium hover:text-primary transition-colors cursor-pointer">
               Dokumentation
             </a>
           </nav>
