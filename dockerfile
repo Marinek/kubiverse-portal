@@ -1,0 +1,33 @@
+# ----- Stage 1: Build -----
+FROM node:20-alpine AS build
+WORKDIR /app
+
+# Nur die Manifeste für Dependencies kopieren (bessere Layer-Caches)
+COPY package*.json ./
+
+# Installiere Dependencies reproduzierbar
+RUN npm ci
+
+# Restlichen Source-Code kopieren und Build erzeugen
+COPY . .
+ENV NODE_ENV=production
+RUN npm run build
+
+# ----- Stage 2: Static Serve mit Nginx -----
+FROM nginx:1.27-alpine
+
+# Standard-Site entfernen und eigene Nginx-Config kopieren
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Gebautes Frontend nach Nginx Webroot
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Standard-Port
+EXPOSE 80
+
+# Hinweis: Healthchecks macht Kubernetes (readiness/livenessProbes).
+# Der Container-Healthcheck ist nicht nötig und spart Imagegröße.
+
+# Nginx im Vordergrund starten
+CMD ["nginx", "-g", "daemon off;"]
