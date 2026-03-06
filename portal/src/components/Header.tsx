@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { BookOpen, HelpCircle } from "lucide-react";
+import { LayoutGrid } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Header = () => {
   return (
@@ -15,12 +16,12 @@ export const Header = () => {
               <p className="text-sm text-muted-foreground">DevOps Portal</p>
             </div>
           </div>
-          
+
           <nav className="hidden md:flex items-center space-x-6">
-            <a href="#kubiverse" className="text-sm font-medium hover:text-primary transition-colors">
+            <a href="/#kubiverse" className="text-sm font-medium hover:text-primary transition-colors">
               Was ist das Kubiverse?
             </a>
-            <a href="#deployment" className="text-sm font-medium hover:text-primary transition-colors">
+            <a href="/#deployment" className="text-sm font-medium hover:text-primary transition-colors">
               Projekt veröffentlichen
             </a>
             <a href="#documentation" className="text-sm font-medium hover:text-primary transition-colors">
@@ -29,14 +30,12 @@ export const Header = () => {
           </nav>
 
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm">
-              <BookOpen className="w-4 h-4 mr-2" />
-              Docs
-            </Button>
-            <Button variant="ghost" size="sm">
-              <HelpCircle className="w-4 h-4 mr-2" />
-              Hilfe
-            </Button>
+            <Link to="/argocd">
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm">
+                <LayoutGrid className="w-4 h-4 mr-2" />
+                Application Hub
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

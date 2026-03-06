@@ -20,3 +20,7 @@ spring:
 jwt:
   secret: aVeryStrongSecretKeyThatShouldBeAtLeastThirtyTwoBytesLongForHS256
   expiration: 86400000 # 24 hours
+
+argocd:
+  url: ${ARGOCD_URL:http://localhost:12004}
+  api-key: ${ARGOCD_API_KEY:mock-token}

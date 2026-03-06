@@ -1,7 +1,7 @@
-> Task :compileJava UP-TO-DATE
+> Task :compileJava
 > Task :processResources UP-TO-DATE
-> Task :classes UP-TO-DATE
-> Task :resolveMainClassName UP-TO-DATE
+> Task :classes
+> Task :resolveMainClassName
 
 > Task :bootRun
 
@@ -14,23 +14,23 @@
 
  :: Spring Boot ::                (v3.4.2)
 
-2026-03-06T22:05:19.680+01:00  INFO 15592 --- [Kubiverse Portal] [           main] c.k.portal.server.ServerApplication      : Starting ServerApplication using Java 21.0.10 with PID 15592 (P:\kubiverse-portal\server\build\classes\java\main started by Marcinek in P:\kubiverse-portal\server)
-2026-03-06T22:05:19.683+01:00  INFO 15592 --- [Kubiverse Portal] [           main] c.k.portal.server.ServerApplication      : No active profile set, falling back to 1 default profile: "default"
-2026-03-06T22:05:20.244+01:00  INFO 15592 --- [Kubiverse Portal] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-03-06T22:05:20.265+01:00  INFO 15592 --- [Kubiverse Portal] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 14 ms. Found 0 JPA repository interfaces.
-2026-03-06T22:05:20.768+01:00  INFO 15592 --- [Kubiverse Portal] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 12001 (http)
-2026-03-06T22:05:20.782+01:00  INFO 15592 --- [Kubiverse Portal] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-03-06T22:05:20.782+01:00  INFO 15592 --- [Kubiverse Portal] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
-2026-03-06T22:05:20.821+01:00  INFO 15592 --- [Kubiverse Portal] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2026-03-06T22:05:20.822+01:00  INFO 15592 --- [Kubiverse Portal] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1107 ms
-2026-03-06T22:05:20.959+01:00  INFO 15592 --- [Kubiverse Portal] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-03-06T22:05:20.999+01:00  INFO 15592 --- [Kubiverse Portal] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
-2026-03-06T22:05:21.020+01:00  INFO 15592 --- [Kubiverse Portal] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2026-03-06T22:05:21.200+01:00  INFO 15592 --- [Kubiverse Portal] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-03-06T22:05:21.221+01:00  INFO 15592 --- [Kubiverse Portal] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-03-06T22:05:21.646+01:00  INFO 15592 --- [Kubiverse Portal] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1d6f77d7
-2026-03-06T22:05:21.648+01:00  INFO 15592 --- [Kubiverse Portal] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-03-06T22:05:21.724+01:00  INFO 15592 --- [Kubiverse Portal] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2026-03-06T23:01:05.885+01:00  INFO 2276 --- [Kubiverse Portal] [           main] c.k.portal.server.ServerApplication      : Starting ServerApplication using Java 21.0.10 with PID 2276 (P:\kubiverse-portal\server\build\classes\java\main started by Marcinek in P:\kubiverse-portal\server)
+2026-03-06T23:01:05.887+01:00  INFO 2276 --- [Kubiverse Portal] [           main] c.k.portal.server.ServerApplication      : No active profile set, falling back to 1 default profile: "default"
+2026-03-06T23:01:06.218+01:00  INFO 2276 --- [Kubiverse Portal] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-06T23:01:06.231+01:00  INFO 2276 --- [Kubiverse Portal] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 8 ms. Found 0 JPA repository interfaces.
+2026-03-06T23:01:06.516+01:00  INFO 2276 --- [Kubiverse Portal] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 12001 (http)
+2026-03-06T23:01:06.524+01:00  INFO 2276 --- [Kubiverse Portal] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-03-06T23:01:06.525+01:00  INFO 2276 --- [Kubiverse Portal] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-03-06T23:01:06.554+01:00  INFO 2276 --- [Kubiverse Portal] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-03-06T23:01:06.555+01:00  INFO 2276 --- [Kubiverse Portal] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 646 ms
+2026-03-06T23:01:06.643+01:00  INFO 2276 --- [Kubiverse Portal] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-03-06T23:01:06.671+01:00  INFO 2276 --- [Kubiverse Portal] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2026-03-06T23:01:06.686+01:00  INFO 2276 --- [Kubiverse Portal] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-03-06T23:01:06.815+01:00  INFO 2276 --- [Kubiverse Portal] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-06T23:01:06.829+01:00  INFO 2276 --- [Kubiverse Portal] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-03-06T23:01:06.915+01:00  INFO 2276 --- [Kubiverse Portal] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@55053f81
+2026-03-06T23:01:06.916+01:00  INFO 2276 --- [Kubiverse Portal] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-03-06T23:01:06.950+01:00  INFO 2276 --- [Kubiverse Portal] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
 	Database driver: undefined/unknown
 	Database version: 16.13
@@ -38,9 +38,20 @@
 	Isolation level: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2026-03-06T22:05:21.927+01:00  INFO 15592 --- [Kubiverse Portal] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-03-06T22:05:21.930+01:00  INFO 15592 --- [Kubiverse Portal] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-03-06T22:05:21.962+01:00  WARN 15592 --- [Kubiverse Portal] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-03-06T22:05:21.983+01:00  INFO 15592 --- [Kubiverse Portal] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
-2026-03-06T22:05:22.492+01:00  INFO 15592 --- [Kubiverse Portal] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 12001 (http) with context path '/'
-2026-03-06T22:05:22.499+01:00  INFO 15592 --- [Kubiverse Portal] [           main] c.k.portal.server.ServerApplication      : Started ServerApplication in 3.182 seconds (process running for 3.412)
+2026-03-06T23:01:07.119+01:00  INFO 2276 --- [Kubiverse Portal] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-03-06T23:01:07.123+01:00  INFO 2276 --- [Kubiverse Portal] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-06T23:01:07.274+01:00  WARN 2276 --- [Kubiverse Portal] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-03-06T23:01:07.293+01:00  INFO 2276 --- [Kubiverse Portal] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-03-06T23:01:07.542+01:00  INFO 2276 --- [Kubiverse Portal] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 12001 (http) with context path '/'
+2026-03-06T23:01:07.551+01:00  INFO 2276 --- [Kubiverse Portal] [           main] c.k.portal.server.ServerApplication      : Started ServerApplication in 1.888 seconds (process running for 2.064)
+2026-03-06T23:01:11.434+01:00  INFO 2276 --- [Kubiverse Portal] [io-12001-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-03-06T23:01:11.434+01:00  INFO 2276 --- [Kubiverse Portal] [io-12001-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-03-06T23:01:11.435+01:00  INFO 2276 --- [Kubiverse Portal] [io-12001-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-03-06T23:01:11.512+01:00  INFO 2276 --- [Kubiverse Portal] [io-12001-exec-1] c.k.portal.server.service.ArgoCdService  : Fetching applications from ArgoCD API
+2026-03-06T23:01:42.195+01:00  INFO 2276 --- [Kubiverse Portal] [io-12001-exec-2] c.k.portal.server.service.ArgoCdService  : Fetching applications from ArgoCD API
+2026-03-06T23:01:59.547+01:00  INFO 2276 --- [Kubiverse Portal] [io-12001-exec-3] c.k.portal.server.service.ArgoCdService  : Fetching applications from ArgoCD API
+2026-03-06T23:02:12.328+01:00  INFO 2276 --- [Kubiverse Portal] [io-12001-exec-6] c.k.portal.server.service.ArgoCdService  : Fetching applications from ArgoCD API
+2026-03-06T23:02:19.654+01:00  INFO 2276 --- [Kubiverse Portal] [io-12001-exec-5] c.k.portal.server.service.ArgoCdService  : Fetching applications from ArgoCD API
+2026-03-06T23:02:23.595+01:00  INFO 2276 --- [Kubiverse Portal] [io-12001-exec-4] c.k.portal.server.service.ArgoCdService  : Fetching applications from ArgoCD API
+2026-03-06T23:02:54.118+01:00  INFO 2276 --- [Kubiverse Portal] [io-12001-exec-7] c.k.portal.server.service.ArgoCdService  : Fetching applications from ArgoCD API
+2026-03-06T23:03:24.635+01:00  INFO 2276 --- [Kubiverse Portal] [io-12001-exec-8] c.k.portal.server.service.ArgoCdService  : Fetching applications from ArgoCD API

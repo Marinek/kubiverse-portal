@@ -68,6 +68,22 @@ else
     echo -e "\e[33m[-] Client directory not found. Skipping frontend startup.\e[0m"
 fi
 
+# 4. Start Mock Server (Port 12004)
+echo -e "\n\e[34m[>] Starting ArgoCD Mock Server...\e[0m"
+if [ -d "mock" ]; then
+    cd mock
+    if [ ! -d "node_modules" ]; then
+        echo -e "\e[33m[*] Installing mock dependencies...\e[0m"
+        npm install
+    fi
+    node server.js > ../mock.log 2>&1 &
+    MOCK_PID=$!
+    echo -e "\e[32m[+] Mock Server starting on port 12004 (PID: $MOCK_PID)\e[0m"
+    cd ..
+else
+    echo -e "\e[33m[-] Mock directory not found. Skipping mock server startup.\e[0m"
+fi
+
 echo -e "\n\e[32m[+] ==========================================\e[0m"
 echo -e "\e[32m[+] Start Process Complete!\e[0m"
 echo -e "\e[32m[+] App is booting up in the background.\e[0m"
@@ -88,6 +104,10 @@ cleanup() {
     if [ -n "$CLIENT_PID" ]; then
         echo -e "\e[34m[>] Stopping Client (PID: $CLIENT_PID)...\e[0m"
         kill -TERM $CLIENT_PID 2>/dev/null
+    fi
+    if [ -n "$MOCK_PID" ]; then
+        echo -e "\e[34m[>] Stopping Mock Server (PID: $MOCK_PID)...\e[0m"
+        kill -TERM $MOCK_PID 2>/dev/null
     fi
     # Optional: uncomment to also stop docker-compose on quit
     # echo -e "\e[34m[>] Stopping Docker Compose...\e[0m"

@@ -6,28 +6,28 @@ export const Hero = () => {
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
       {/* Background Image */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/70 to-accent/80" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-800/80 to-slate-900/90" />
       </div>
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-6 inline-flex items-center px-3 py-1 rounded-full bg-accent/20 text-accent-foreground border border-accent/30">
-            <Rocket className="w-4 h-4 mr-2 text-primary-foreground" />
-            <span className="text-sm font-medium text-primary-foreground">Kubernetes-basierte Deployment-Plattform</span>
+          <div className="mb-6 inline-flex items-center px-4 py-1.5 rounded-full bg-slate-800/80 text-slate-200 border border-slate-600 shadow-sm backdrop-blur-sm">
+            <Rocket className="w-4 h-4 mr-2 text-white" />
+            <span className="text-sm font-medium text-white">Kubernetes-basierte Deployment-Plattform</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold mb-6 text-primary-foreground">
             Willkommen im{" "}
-              FMS-Kubiverse
+            FMS-Kubiverse
           </h1>
 
           <p className="text-xl md:text-2xl mb-8 text-primary-foreground/90 max-w-3xl mx-auto leading-relaxed">
-            Dein Portal zur automatisierten Testwelt – Skalierbare Kubernetes-Deployments 
+            Dein Portal zur automatisierten Testwelt – Skalierbare Kubernetes-Deployments
             für Formularmanagement-Projekte mit CI/CD-Integration
           </p>
 

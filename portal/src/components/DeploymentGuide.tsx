@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   ArrowRight,
   CheckCircle2,
   GitBranch,
@@ -25,13 +25,13 @@ export const DeploymentGuide = () => {
       ]
     },
     {
-      number: "02", 
+      number: "02",
       icon: GitBranch,
       title: "Branch pushen",
       description: "Pushen Sie Ihren Code in einen entsprechenden Branch (z.B. feature/test-deployment)",
       details: [
         "Branch-Naming nach Git-Konventionen",
-        "feature/* für Feature-Deployments", 
+        "feature/* für Feature-Deployments",
         "test/* für Testumgebungen",
         "staging/* für Staging-Deployments"
       ]
@@ -84,7 +84,7 @@ export const DeploymentGuide = () => {
           </Badge>
           <h2 className="text-4xl font-bold mb-6">Projekt veröffentlichen</h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            In nur 5 einfachen Schritten ist Ihr Projekt im Kubiverse deployed und 
+            In nur 5 einfachen Schritten ist Ihr Projekt im Kubiverse deployed und
             über eine eigene URL erreichbar. Der gesamte Prozess läuft vollautomatisch ab.
           </p>
         </div>
@@ -131,17 +131,13 @@ export const DeploymentGuide = () => {
             Bereit für Ihr erstes Deployment?
           </h3>
           <p className="text-primary-foreground/90 mb-6 max-w-2xl mx-auto">
-            Folgen Sie unserer Schritt-für-Schritt-Anleitung und haben Sie Ihr 
+            Folgen Sie unserer Schritt-für-Schritt-Anleitung und haben Sie Ihr
             Projekt in wenigen Minuten im Kubiverse deployed.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="secondary" size="lg" className="group">
               Deployment starten
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button variant="outline" size="lg" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Git-Konventionen ansehen
             </Button>
           </div>
         </div>
