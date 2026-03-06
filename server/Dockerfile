@@ -31,7 +31,7 @@ EXPOSE 8080
 
 # Environment variables matching our spring config structure
 # Default properties can be overridden at runtime via these ENV vars
-ENV SPRING_PROFILES_ACTIVE=default \
+ENV SPRING_PROFILES_ACTIVE=no-db \
     ARGOCD_URL=http://localhost:12004 \
     ARGOCD_API_KEY=mock-key-12345
 

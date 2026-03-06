@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: Kubiverse Portal
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:no-db}
   datasource:
     url: jdbc:postgresql://localhost:12002/kubiverse-portal
     username: root
@@ -24,3 +26,13 @@ jwt:
 argocd:
   url: ${ARGOCD_URL:http://localhost:12004}
   api-key: ${ARGOCD_API_KEY:mock-token}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "no-db"
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
