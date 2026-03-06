@@ -1,0 +1,20 @@
+# Git
+.git
+.gitignore
+
+# Gradle
+.gradle
+build/
+!build/libs/*.jar
+!build/libs/*SNAPSHOT.jar
+gradle/wrapper/gradle-wrapper.jar
+
+# IDEs and OS files
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+bin/
+out/

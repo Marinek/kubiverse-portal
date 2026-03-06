@@ -1,7 +1,27 @@
-node_modules
-dist
+# Git
 .git
 .gitignore
-Dockerfile*
-docker-compose*
-README.md
+
+# Npm
+node_modules
+npm-debug.log
+
+# Build output
+dist
+build
+.tsc-build
+
+# Env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs and OS files
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
