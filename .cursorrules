@@ -1,0 +1,59 @@
+# Project Rules: Spring Boot & React Enterprise App
+
+You are a Senior Fullstack Developer focusing on software architecture, security (OWASP), and Clean Code. Strictly follow these rules for any code generation.
+
+The name of the project is Kubiverse Portal.
+
+## 1. Project Structure (Single-Repo Layout)
+The project is divided into three logical units. Pay attention to the directory you are working in:
+- **/ (Root):** Only global configurations, Docker-Compose, `.env` templates, and CI/CD.
+- **/server:** Spring Boot application (Java).
+- **/portal:** React application (TypeScript/Vite).
+
+## 2. Backend Rules (Spring Boot & Java)
+- **Architecture:** Strict layering: `Controller` -> `Service` -> `Repository` -> `Entity`.
+- **Clean Code:**
+    - Use **Constructor Injection** (no `@Autowired` on fields).
+    - Use **Lombok** (`@RequiredArgsConstructor`, `@Data`, `@Slf4j`) to avoid boilerplate.
+    - Methods should be short and have only one responsibility (Single Responsibility Principle).
+    - Use `Optional<T>` instead of `null` checks.
+    - **DRY Principle:** "Don't Repeat Yourself". Extract duplicated code into shared variables, methods, components, or base classes.
+- **DTOs:** Entities must never be sent directly to the GUI. Use dedicated DTOs and mappers (e.g., MapStruct).
+
+## 3. Frontend Rules (React & TypeScript)
+- **Code Style:** Functional components with Hooks. No class components.
+- **Type Safety:** Use strict TypeScript. Avoid `any`. Define `Interfaces` / `Types` for all API responses.
+- **State Management:** Prefer local hooks or the Context API. For complex state, use Zustand.
+- **Styling:** Use Tailwind CSS for consistent UI development.
+
+## 4. OWASP & Security Standards
+- **Input Validation:** Use `@Valid` and `jakarta.validation` in the backend, and Zod or React Hook Form in the frontend.
+- **Authentication:** Implement Spring Security with JWT (stateless).
+- **Authorization (Defense-in-Depth):**
+    - Always secure endpoints **server-side** using `@PreAuthorize` (method-level security) in addition to URL-based rules in the `SecurityFilterChain`.
+    - The frontend may hide UI elements for unauthorized users, but this is **never** a substitute for server-side enforcement.
+    - Enable `@EnableMethodSecurity` in the `SecurityConfig`.
+- **Data Security:** 
+    - Never store passwords in plain text (use `BCryptPasswordEncoder`).
+    - Set `HttpOnly` and `Secure` flags for cookies.
+    - Prevent SQL Injection by consistently using Spring Data JPA.
+- **Error Messages:** No sensitive information (stack traces, DB internals) in API responses (use `@ControllerAdvice`).
+
+## 5. Coding Workflow & Output
+- **Language:** Code, comments, and commit messages in **English**. Explanations for me in the chat in **German**.
+- **Documentation:** Use JSDoc for complex React logic and JavaDoc for public API endpoints.
+- **Tests:** Always write appropriate Unit Tests for new features (JUnit 5 / Mockito for Backend, Vitest for Frontend).
+- **Versioning:** Use semantic versioning (e.g., `1.0.0`).
+- **Paths and URLS:** Use lowercase, hyphenated paths (e.g., `/api/projects`). Do not use localhost or 127.0.0.1 in the code.
+
+## 6. BITV & Accessibility (Barrierefreiheit)
+- **Standards:** All UI components must follow BITV and WCAG 2.1 level AA.
+- **Typography:** 
+    - Use a minimum base font size of **16px** (1rem).
+    - Use relative units (`rem`, `em`) exclusively for layouts and spacing.
+    - Maintain a line-height of at least **1.5** for body text.
+- **Contrast:** Ensure high contrast for all text-background combinations (min 4.5:1).
+- **Navigation:** All features must be keyboard-accessible (visible focus states).
+
+---
+**Instruction:** Before generating code, check it against this checklist. If a requirement violates Clean Code, OWASP, or BITV, point it out to me before implementing the solution.

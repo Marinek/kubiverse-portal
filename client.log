@@ -1,0 +1,15 @@
+
+> vite_react_shadcn_ts@0.0.0 dev
+> vite --port 12000
+
+Re-optimizing dependencies because vite config has changed
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m624[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m12000[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.178.62:[1m12000[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://172.20.224.1:[1m12000[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://172.19.48.1:[1m12000[22m/[39m
+Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
