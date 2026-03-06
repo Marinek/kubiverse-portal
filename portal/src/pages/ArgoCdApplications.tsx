@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Search, RefreshCw, AlertCircle, Globe } from "lucide-react";
+import { ExternalLink, Search, RefreshCw, AlertCircle, Globe, Mail, AppWindow } from "lucide-react";
 import kubicon from "@/assets/kubicon.png";
 
 interface ArgoCdApplication {
@@ -176,23 +176,38 @@ const ArgoCdApplications = () => {
                                                     {app.externalUrls && app.externalUrls.length > 0 && (
                                                         <div className="pt-3 mt-1 border-t border-border/50 flex flex-col gap-2">
                                                             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Anwendungen</span>
-                                                            {app.externalUrls.map((url, idx) => {
-                                                                let name = url;
-                                                                try {
-                                                                    const hostname = new URL(url).hostname;
-                                                                    name = hostname.split('.')[0];
-                                                                    name = name.charAt(0).toUpperCase() + name.slice(1);
-                                                                } catch (e) {
-                                                                    // fallback
-                                                                }
-                                                                return (
-                                                                    <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 hover:underline transition-colors w-full group/link">
-                                                                        <Globe className="h-3.5 w-3.5 text-muted-foreground group-hover/link:text-primary transition-colors flex-shrink-0" />
-                                                                        <span className="truncate">{name}</span>
-                                                                        <ExternalLink className="h-3 w-3 opacity-0 group-hover/link:opacity-100 transition-opacity ml-auto" />
-                                                                    </a>
-                                                                );
-                                                            })}
+                                                            {app.externalUrls
+                                                                .filter(url => !url.toLowerCase().includes('/api/'))
+                                                                .map((url, idx) => {
+                                                                    let name = url;
+                                                                    let isMailpit = false;
+                                                                    try {
+                                                                        const hostname = new URL(url).hostname;
+                                                                        const firstPart = hostname.split('.')[0];
+
+                                                                        if (firstPart.toLowerCase() === 'mailpit' || url.toLowerCase().includes('mailpit')) {
+                                                                            name = 'Mailpit';
+                                                                            isMailpit = true;
+                                                                        } else {
+                                                                            name = firstPart.charAt(0).toUpperCase() + firstPart.slice(1);
+                                                                        }
+                                                                    } catch (e) {
+                                                                        if (url.toLowerCase().includes('mailpit')) {
+                                                                            name = 'Mailpit';
+                                                                            isMailpit = true;
+                                                                        }
+                                                                    }
+
+                                                                    const Icon = isMailpit ? Mail : AppWindow;
+
+                                                                    return (
+                                                                        <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 hover:underline transition-colors w-full group/link border border-transparent hover:border-border/50 p-1.5 -ml-1.5 rounded-md">
+                                                                            <Icon className="h-4 w-4 text-muted-foreground group-hover/link:text-primary transition-colors flex-shrink-0" />
+                                                                            <span className="truncate font-medium">{name}</span>
+                                                                            <ExternalLink className="h-3 w-3 opacity-0 group-hover/link:opacity-100 transition-opacity ml-auto text-muted-foreground" />
+                                                                        </a>
+                                                                    );
+                                                                })}
                                                         </div>
                                                     )}
                                                 </CardContent>

@@ -52,7 +52,16 @@ const mockApplications = {
             status: {
                 health: { status: "Suspended", message: "Scaled to 0" },
                 sync: { status: "Synced", revision: "mno7890" },
-                summary: { externalURLs: [] }
+                summary: { externalURLs: ["https://legacy.kubiverse.internal/api/"] }
+            }
+        },
+        {
+            metadata: { name: "mail-server", namespace: "argocd", uid: "uid-6" },
+            spec: { project: "default" },
+            status: {
+                health: { status: "Healthy", message: "Running" },
+                sync: { status: "Synced", revision: "pqrs123" },
+                summary: { externalURLs: ["https://mailpit.kubiverse.internal"] }
             }
         }
     ]
