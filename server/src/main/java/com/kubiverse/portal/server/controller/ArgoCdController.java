@@ -12,7 +12,7 @@ import com.kubiverse.portal.server.service.ArgoCdService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/argocd")
+@RequestMapping("/kubiverse/api/argocd")
 @RequiredArgsConstructor
 public class ArgoCdController {
 

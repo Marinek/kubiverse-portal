@@ -19,7 +19,7 @@ interface ArgoCdApplication {
 }
 
 const fetchApplications = async (): Promise<ArgoCdApplication[]> => {
-    const response = await fetch("/api/argocd/applications");
+    const response = await fetch("/kubiverse/api/argocd/applications");
     if (!response.ok) {
         throw new Error("Fehler beim Laden der Applikationen");
     }
