@@ -1,5 +1,5 @@
 # ----- Stage 1: Build -----
-FROM node:20-alpine AS build
+FROM node:24-alpine AS build
 WORKDIR /app
 
 # Nur die Manifeste für Dependencies kopieren (bessere Layer-Caches)
@@ -14,7 +14,7 @@ ENV NODE_ENV=production
 RUN npm run build
 
 # ----- Stage 2: Static Serve mit Nginx -----
-FROM nginx:1.27-alpine
+FROM nginx:1.29-alpine
 
 # Standard-Site entfernen und eigene Nginx-Config kopieren
 RUN rm /etc/nginx/conf.d/default.conf

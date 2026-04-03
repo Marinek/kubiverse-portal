@@ -1,21 +1,14 @@
 # ----- Stage 1: Build -----
-FROM eclipse-temurin:21-jdk-alpine AS builder
+FROM gradle:9-jdk21-alpine AS builder
 
 WORKDIR /app
 
-# Copy gradle wrapper files
-COPY gradlew .
-COPY gradle gradle
-
 # Copy build definition files
-COPY build.gradle settings.gradle ./
-
-# Copy the source code
-COPY src src
+COPY . .
 
 # Build the application skipping tests to speed up the container build process
 # We use --no-daemon to avoid keeping the gradle daemon running in the ephemeral container
-RUN ./gradlew build -x test --no-daemon
+RUN gradle build -x test --no-daemon
 
 # ----- Stage 2: Runtime -----
 FROM eclipse-temurin:21-jre-alpine
