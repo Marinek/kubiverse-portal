@@ -9,7 +9,7 @@ The `portal` is a modern web interface built with **React**, **TypeScript**, and
 - **Accessible at:** `http://localhost:80` (or simply on port 80)
 
 ### 2. Server (Backend)
-The `server` is the backend of the application, based on **Java 21** and **Spring Boot 3**. It provides REST APIs, contains the core business logic, and uses PostgreSQL (in production). Currently, the backend runs in the `no-db` profile, meaning it does not require an external database to be set up locally, as it relies on the mock server for fetching external data like ArgoCD.
+The `server` is the backend of the application, based on **Java 21** and **Spring Boot 3**. It provides REST APIs, contains the core business logic.
 - **Accessible at:** `http://localhost:8080`
 
 ### 3. Mock
