@@ -32,11 +32,11 @@ export const Hero = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" variant="secondary" className="group">
+            <Button size="lg" variant="secondary" className="group" onClick={() => document.getElementById('deployment')?.scrollIntoView({ behavior: 'smooth' })}>
               Projekt deployen
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button size="lg" variant="secondary" className="group">
+            <Button size="lg" variant="secondary" className="group" onClick={() => document.getElementById('documentation')?.scrollIntoView({ behavior: 'smooth' })}>
               Dokumentation ansehen
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
