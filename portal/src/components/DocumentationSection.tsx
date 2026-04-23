@@ -180,18 +180,7 @@ export const DocumentationSection = () => {
           </div>
         </div>
 
-        <div className="mt-16 text-center">
-          <div className="inline-flex flex-col sm:flex-row gap-4">
-            <Button size="lg" className="group">
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Confluence öffnen
-            </Button>
-            <Button variant="outline" size="lg">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Support kontaktieren
-            </Button>
-          </div>
-        </div>
+
       </div>
     </section>
   );
