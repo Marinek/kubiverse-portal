@@ -25,6 +25,7 @@ services:
       dockerfile: Dockerfile
       args:
         - VITE_ARGOCD_UI_URL=http://localhost:12004
+        - VITE_TEAMS_CHAT_URL=https://example.com
     ports:
       - "80:80"
     depends_on:

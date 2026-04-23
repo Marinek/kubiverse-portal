@@ -53,15 +53,7 @@ export const DocumentationSection = () => {
       icon: Users,
       title: "DevOps-Team",
       description: "Technische Unterstützung bei Deployment-Problemen",
-      contact: "fms-devops@materna.group",
-      availability: "Mo-Fr, 9:00-17:00"
-    },
-    {
-      icon: MessageCircle,
-      title: "Development Support",
-      description: "Hilfe bei der Projektkonfiguration und Git-Workflows",
-      contact: "fms-devops@materna.group", 
-      availability: "Mo-Fr, 8:00-18:00"
+      contact: "fms-devops@materna.group"
     }
   ];
 
@@ -154,12 +146,20 @@ export const DocumentationSection = () => {
                           {contact.contact}
                         </a>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Verfügbarkeit:</span>
-                        <span className="text-sm text-muted-foreground">
-                          {contact.availability}
-                        </span>
-                      </div>
+                      {import.meta.env.VITE_TEAMS_CHAT_URL && (
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="text-sm font-medium">Teams Chat:</span>
+                          <a 
+                            href={import.meta.env.VITE_TEAMS_CHAT_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-primary hover:underline flex items-center"
+                          >
+                            Chat öffnen
+                            <ExternalLink className="w-3 h-3 ml-1" />
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
