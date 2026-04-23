@@ -77,6 +77,54 @@ app.get('/api/v1/applications', (req, res) => {
     }, 500);
 });
 
+// Bitbucket Server API Mock
+app.post('/rest/api/1.0/projects/:projectKey/repos', (req, res) => {
+    const projectKey = req.params.projectKey;
+    const repoName = req.body.name;
+    const repoSlug = repoName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+    console.log(`[${new Date().toISOString()}] POST /rest/api/1.0/projects/${projectKey}/repos - Creating repo ${repoName}`);
+
+    const response = {
+        slug: repoSlug,
+        id: Math.floor(Math.random() * 1000),
+        name: repoName,
+        scmId: "git",
+        state: "AVAILABLE",
+        statusMessage: "Available",
+        forkable: true,
+        project: {
+            key: projectKey,
+            id: 1,
+            name: projectKey,
+            public: false,
+            type: "NORMAL"
+        },
+        public: false,
+        links: {
+            clone: [
+                {
+                    href: `http://${req.get('host')}/scm/${projectKey.toLowerCase()}/${repoSlug}.git`,
+                    name: "http"
+                },
+                {
+                    href: `ssh://git@${req.hostname || 'localhost'}:7992/${projectKey.toLowerCase()}/${repoSlug}.git`,
+                    name: "ssh"
+                }
+            ],
+            self: [
+                {
+                    href: `http://${req.get('host')}/projects/${projectKey}/repos/${repoSlug}/browse`
+                }
+            ]
+        }
+    };
+
+    setTimeout(() => {
+        res.status(201).json(response);
+    }, 500);
+});
+
 app.listen(PORT, () => {
     console.log(`ArgoCD Mock Server running on http://localhost:${PORT}`);
 });
