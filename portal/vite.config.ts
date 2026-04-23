@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
       port: 8080,
       proxy: {
         "/kubiverse/api": {
-          target: "http://localhost:12001",
+          target: "http://localhost:8080",
           changeOrigin: true,
         },
       },

@@ -1,28 +1,31 @@
 services:
-  db:
-    image: postgres:16-alpine
-    container_name: kubiverse-portal-db
-    environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: rootpassword
-      POSTGRES_DB: kubiverse-portal
+  mock:
+    build:
+      context: ./mock
     ports:
-      - "12002:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+      - "12004:12004"
     restart: unless-stopped
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: kubiverse-portal-pgadmin
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: root
+      - ARGOCD_URL=http://mock:12004
+      - SPRING_PROFILES_ACTIVE=no-db
     ports:
-      - "12003:80"
+      - "8080:8080"
     depends_on:
-      - db
+      - mock
     restart: unless-stopped
 
-volumes:
-  pgdata:
+  portal:
+    build:
+      context: ./portal
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - mock
+      - server
+    restart: unless-stopped
