@@ -11,6 +11,8 @@ RUN npm ci
 # Restlichen Source-Code kopieren und Build erzeugen
 COPY . .
 ENV NODE_ENV=production
+ARG VITE_ARGOCD_UI_URL
+ENV VITE_ARGOCD_UI_URL=$VITE_ARGOCD_UI_URL
 RUN npm run build
 
 # ----- Stage 2: Static Serve mit Nginx -----
