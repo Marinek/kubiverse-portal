@@ -1,0 +1,13 @@
+{
+  "name": "kubiverse-workspace",
+  "private": true,
+  "workspaces": [
+    "portal",
+    "shared",
+    "orchestrator"
+  ],
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "handlebars": "^4.7.9"
+  }
+}

@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Rocket } from "lucide-react";
 import heroImage from "@/assets/hero-kubiverse.jpg";
+import { ProjectInitWizard } from "./ProjectInitWizard";
 
 export const Hero = () => {
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
+
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -32,7 +36,7 @@ export const Hero = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" variant="secondary" className="group">
+            <Button size="lg" variant="secondary" className="group" onClick={() => setIsWizardOpen(true)}>
               Projekt deployen
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -46,6 +50,7 @@ export const Hero = () => {
 
       {/* Decorative Elements */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      <ProjectInitWizard open={isWizardOpen} onOpenChange={setIsWizardOpen} />
     </section>
   );
 };

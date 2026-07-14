@@ -29,3 +29,23 @@ services:
       - mock
       - server
     restart: unless-stopped
+
+  gitea:
+    image: gitea/gitea:1.21.0
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    restart: always
+    ports:
+      - "3000:3000"
+      - "2222:22"
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    environment:
+      - JENKINS_OPTS=--prefix=/jenkins
+    restart: unless-stopped
