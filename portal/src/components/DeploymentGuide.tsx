@@ -5,22 +5,24 @@ import {
   ArrowRight,
   CheckCircle2,
   GitBranch,
+  FolderGit2,
   Rocket,
   Globe,
   Settings,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from "lucide-react";
 
 export const DeploymentGuide = () => {
   const steps = [
     {
       number: "01",
-      icon: Settings,
-      title: "Projekt in Bitbucket anlegen",
-      description: "Erstellen Sie ein neues Repository oder aktualisieren Sie ein bestehendes Projekt in Bitbucket",
+      icon: FolderGit2,
+      title: "Neues Projekt in Bitbucket anlegen",
+      description: "Dieser Schritt dient nur zur Erstellung neuer Git-Projekte. Falls bereits ein Projekt existiert, kann dieser Schritt übersprungen werden.",
       details: [
-        "Repository erstellen oder Code aktualisieren",
-        "Deployment-Konfiguration hinzufügen",
+        "Neues Repository aus Template erstellen",
+        "Deployment-Konfiguration ist bereits enthalten",
         "Branch-Struktur nach internen Konventionen"
       ]
     },

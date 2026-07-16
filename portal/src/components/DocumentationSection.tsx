@@ -20,7 +20,8 @@ export const DocumentationSection = () => {
       description: "Ausführliche Anleitung zum Deployment von Projekten im Kubiverse",
       type: "Confluence",
       color: "bg-blue-500",
-      urgent: false
+      urgent: false,
+      link: import.meta.env.VITE_DOCS_DEPLOYMENT_GUIDE_URL || "#"
     },
     {
       icon: FileText,
@@ -28,7 +29,8 @@ export const DocumentationSection = () => {
       description: "Branch-Naming, Commit-Messages und Workflow-Standards",
       type: "Confluence", 
       color: "bg-green-500",
-      urgent: false
+      urgent: false,
+      link: import.meta.env.VITE_DOCS_GIT_CONVENTIONS_URL || "#"
     },
     {
       icon: Zap,
@@ -36,7 +38,8 @@ export const DocumentationSection = () => {
       description: "Setup und Konfiguration der automatisierten Deployment-Pipelines",
       type: "Confluence",
       color: "bg-purple-500",
-      urgent: false
+      urgent: false,
+      link: import.meta.env.VITE_DOCS_CICD_PIPELINE_URL || "#"
     },
     {
       icon: AlertCircle,
@@ -44,7 +47,8 @@ export const DocumentationSection = () => {
       description: "Häufige Probleme und deren Lösungen bei Deployments",
       type: "Confluence",
       color: "bg-orange-500",
-      urgent: true
+      urgent: true,
+      link: import.meta.env.VITE_DOCS_TROUBLESHOOTING_URL || "#"
     }
   ];
 
@@ -53,15 +57,7 @@ export const DocumentationSection = () => {
       icon: Users,
       title: "DevOps-Team",
       description: "Technische Unterstützung bei Deployment-Problemen",
-      contact: "fms-devops@materna.group",
-      availability: "Mo-Fr, 9:00-17:00"
-    },
-    {
-      icon: MessageCircle,
-      title: "Development Support",
-      description: "Hilfe bei der Projektkonfiguration und Git-Workflows",
-      contact: "fms-devops@materna.group", 
-      availability: "Mo-Fr, 8:00-18:00"
+      contact: "fms-devops@materna.group"
     }
   ];
 
@@ -88,36 +84,44 @@ export const DocumentationSection = () => {
             </h3>
             <div className="space-y-4">
               {resources.map((resource, index) => (
-                <Card key={index} className="group hover:shadow-card transition-all duration-300 hover:-translate-y-1">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start space-x-4">
-                        <div className={`w-10 h-10 ${resource.color} rounded-lg flex items-center justify-center`}>
-                          <resource.icon className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <CardTitle className="text-lg">{resource.title}</CardTitle>
-                            {resource.urgent && (
-                              <Badge variant="destructive" className="text-xs">
-                                Wichtig
-                              </Badge>
-                            )}
+                <a 
+                  key={index} 
+                  href={resource.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="block group"
+                >
+                  <Card className="hover:shadow-card transition-all duration-300 group-hover:-translate-y-1 h-full cursor-pointer">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-4">
+                          <div className={`w-10 h-10 ${resource.color} rounded-lg flex items-center justify-center`}>
+                            <resource.icon className="w-5 h-5 text-white" />
                           </div>
-                          <Badge variant="outline" className="text-xs mt-1">
-                            {resource.type}
-                          </Badge>
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2">
+                              <CardTitle className="text-lg">{resource.title}</CardTitle>
+                              {resource.urgent && (
+                                <Badge variant="destructive" className="text-xs">
+                                  Wichtig
+                                </Badge>
+                              )}
+                            </div>
+                            <Badge variant="outline" className="text-xs mt-1">
+                              {resource.type}
+                            </Badge>
+                          </div>
                         </div>
+                        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                       </div>
-                      <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-sm">
-                      {resource.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription className="text-sm">
+                        {resource.description}
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                </a>
               ))}
             </div>
           </div>
@@ -154,12 +158,20 @@ export const DocumentationSection = () => {
                           {contact.contact}
                         </a>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Verfügbarkeit:</span>
-                        <span className="text-sm text-muted-foreground">
-                          {contact.availability}
-                        </span>
-                      </div>
+                      {import.meta.env.VITE_TEAMS_CHAT_URL && (
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="text-sm font-medium">Teams Chat:</span>
+                          <a 
+                            href={import.meta.env.VITE_TEAMS_CHAT_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-primary hover:underline flex items-center"
+                          >
+                            Chat öffnen
+                            <ExternalLink className="w-3 h-3 ml-1" />
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -168,18 +180,7 @@ export const DocumentationSection = () => {
           </div>
         </div>
 
-        <div className="mt-16 text-center">
-          <div className="inline-flex flex-col sm:flex-row gap-4">
-            <Button size="lg" className="group">
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Confluence öffnen
-            </Button>
-            <Button variant="outline" size="lg">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Support kontaktieren
-            </Button>
-          </div>
-        </div>
+
       </div>
     </section>
   );
