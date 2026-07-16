@@ -19,15 +19,36 @@ services:
       - mock
     restart: unless-stopped
 
+  orchestrator:
+    build:
+      context: .
+      dockerfile: orchestrator/Dockerfile
+    environment:
+      - BITBUCKET_API_URL=http://mock:12004/bitbucket/rest/api/1.0
+      - BITBUCKET_USER=gitea_admin
+      - BITBUCKET_AUTH_TOKEN=gitea_admin
+      - JENKINS_API_URL=http://jenkins:8080/jenkins
+      - JENKINS_USER=admin
+      - JENKINS_AUTH_TOKEN=11e375bd7a10f38d4e4cc3755e94b442a0
+      - LIP4_BASE_REPO_URL=http://gitea:3000/gitea_admin/fms-base-setup-4o.git
+      - HELM_GITOPS_REPO_URL=http://gitea:3000/gitea_admin/gitops-repo.git
+    ports:
+      - "3001:3001"
+    depends_on:
+      - gitea
+      - jenkins
+    restart: unless-stopped
+
   portal:
     build:
-      context: ./portal
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: portal/dockerfile
     ports:
       - "80:80"
     depends_on:
       - mock
       - server
+      - orchestrator
     restart: unless-stopped
 
   gitea:
@@ -44,7 +65,7 @@ services:
     image: jenkins/jenkins:lts
     user: root
     ports:
-      - "8080:8080"
+      - "8081:8080"
       - "50000:50000"
     environment:
       - JENKINS_OPTS=--prefix=/jenkins

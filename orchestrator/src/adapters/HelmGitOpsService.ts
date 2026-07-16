@@ -48,7 +48,10 @@ export class HelmGitOpsService implements IGitOpsService {
     }
 
     async cloneRegistry(): Promise<string> {
-        const repoUrl = this.config.HELM_GITOPS_REPO_URL;
+        let repoUrl = this.config.HELM_GITOPS_REPO_URL;
+        const { BITBUCKET_USER, BITBUCKET_AUTH_TOKEN } = this.config;
+        repoUrl = repoUrl.replace('https://', `https://${BITBUCKET_USER}:${BITBUCKET_AUTH_TOKEN}@`).replace('http://', `http://${BITBUCKET_USER}:${BITBUCKET_AUTH_TOKEN}@`);
+
         const localPath = path.resolve(process.cwd(), 'tmp_workspaces', `gitops_${Date.now()}_${Math.random().toString(36).substring(7)}`);
         
         console.log(`[GitOps] Cloning GitOps Registry from ${repoUrl} to ${localPath}`);
