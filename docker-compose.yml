@@ -24,12 +24,13 @@ services:
       context: ./portal
       dockerfile: Dockerfile
       args:
-        - VITE_ARGOCD_UI_URL=http://localhost:12004
-        - VITE_TEAMS_CHAT_URL=https://example.com
-        - VITE_DOCS_DEPLOYMENT_GUIDE_URL=https://confluence.example.com/deployment
-        - VITE_DOCS_GIT_CONVENTIONS_URL=https://confluence.example.com/git
-        - VITE_DOCS_CICD_PIPELINE_URL=https://confluence.example.com/cicd
-        - VITE_DOCS_TROUBLESHOOTING_URL=https://confluence.example.com/troubleshooting
+        - VITE_ARGOCD_UI_URL=https://argocd.fms-kubiverse.materna.net/
+        - VITE_TEAMS_CHAT_URL=https://teams.microsoft.com/l/channel/19%3A72ac354d15d5442b99836a316d511dd0%40thread.tacv2/Support%20-%20Build%2C%20VM%2C%20DB?groupId=dfb3d278-87f9-49b3-8a6e-16efa9282298&tenantId=72e67b6b-5fe2-4c81-ba51-be2b36a693a0
+        - VITE_DOCS_DEPLOYMENT_GUIDE_URL=https://wiki.materna.net/x/74cCCg
+        - VITE_DOCS_CONVENTIONS_URL=https://wiki.materna.net/x/dIl
+        - VITE_DOCS_CICD_PIPELINE_URL=https://wiki.materna.net/x/HYL7KQ
+        - VITE_DOCS_TROUBLESHOOTING_URL=https://wiki.materna.net/x/A4KRL
+        - VITE_DOCS_FLYER_URL=https://wiki.materna.net/x/RwGgJg
     ports:
       - "80:80"
     depends_on:
