@@ -19,12 +19,13 @@ export const DeploymentGuide = () => {
       number: "01",
       icon: FolderGit2,
       title: "Neues Projekt in Bitbucket anlegen",
-      description: "Dieser Schritt dient nur zur Erstellung neuer Git-Projekte. Falls bereits ein Projekt existiert, kann dieser Schritt übersprungen werden.",
+      description: "Dieser Schritt dient zur Erstellung eines neuen Projekts. Falls bereits eines existiert, kann er übersprungen werden.",
       details: [
-        "Neues Repository aus Template erstellen",
+        "Neues Bitbucket Repository aus Template erstellen",
         "Deployment-Konfiguration ist bereits enthalten",
-        "Branch-Struktur nach internen Konventionen"
-      ]
+        "Ein Jira Board oder Confluence können (wenn erforderlich) über ein ALM Ticket beantragt werden"
+      ],
+      link: "https://bitbucket.materna.net"
     },
     {
       number: "02",
@@ -32,46 +33,49 @@ export const DeploymentGuide = () => {
       title: "Branch pushen",
       description: "Pushen Sie Ihren Code in einen entsprechenden Branch (z.B. feature/test-deployment)",
       details: [
-        "Branch-Naming nach Git-Konventionen",
         "feature/* für Feature-Deployments",
-        "test/* für Testumgebungen",
-        "staging/* für Staging-Deployments"
-      ]
+        "develop für aktuellen Entwicklungsstand",
+        "release/* für ausgewählten Release-Stand",
+        "master für Referenzstand beim Kunden"
+      ],
+      link: "https://bitbucket.materna.net"
     },
     {
       number: "03",
       icon: Rocket,
       title: "CI/CD-Pipeline automatisch ausgelöst",
-      description: "Die Pipeline erkennt automatisch den Push und startet den Deployment-Prozess",
+      description: "Die (Jenkins-)Pipeline erkennt automatisch den Push und startet den Build-Prozess",
       details: [
         "Automatische Erkennung von Deployment-Branches",
         "Build-Prozess wird gestartet",
         "Container-Image wird erstellt",
-        "Tests werden ausgeführt"
-      ]
+        "Release-Artefakte werden ggf. erstellt"
+      ],
+      link: "https://fms-jenkins.materna.net"
     },
     {
       number: "04",
       icon: CheckCircle2,
-      title: "Deployment in eigenem Namespace",
-      description: "Ihr Projekt wird in einem isolierten Kubernetes-Namespace deployed",
+      title: "Deployment automatisch ausgelöst",
+      description: "Ein erfolgreicher Build löst (über ArgoCD) automatisch ein Deployment in den Kubernetes-Namespace des Projekts aus",
       details: [
         "Eigener Namespace pro Projekt",
         "Isolierte Ressourcen",
         "Automatische Skalierung",
-        "Health-Checks und Monitoring"
-      ]
+        "Health-Checks und Log-Prüfung"
+      ],
+      link: "https://argocd.fms-kubiverse.materna.net/"
     },
     {
       number: "05",
       icon: Globe,
-      title: "Zugriff über generierte URL",
-      description: "Nach erfolgreichem Deployment ist Ihr Projekt über eine automatisch generierte URL erreichbar",
+      title: "Projekt ist online über seine Kubiverse URL",
+      description: "Nach dem Deployment ist das Projekt über seine Kubiverse URL erreichbar",
       details: [
-        "Format: projektname.kubiverse.xxx.de",
+        "URL Format: projektname.kubiverse.xxx.de",
         "HTTPS automatisch konfiguriert",
         "Load Balancing integriert",
-        "URL wird automatisch generiert"
+        "Tests und Monitoring der Anwendungen und Dienste des Projekts"
       ]
     }
   ];
