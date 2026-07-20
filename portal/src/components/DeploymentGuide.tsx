@@ -131,22 +131,6 @@ export const DeploymentGuide = () => {
             </Card>
           ))}
         </div>
-
-        <div className="mt-16 p-8 bg-gradient-hero rounded-2xl shadow-elegant text-center">
-          <h3 className="text-2xl font-bold text-primary-foreground mb-4">
-            Bereit für Ihr erstes Deployment?
-          </h3>
-          <p className="text-primary-foreground/90 mb-6 max-w-2xl mx-auto">
-            Folgen Sie unserer Schritt-für-Schritt-Anleitung und haben Sie Ihr
-            Projekt in wenigen Minuten im Kubiverse deployed.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="secondary" size="lg" className="group">
-              Deployment starten
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </div>
-        </div>
       </div>
     </section>
   );

@@ -78,23 +78,6 @@ export const KubiverseSection = () => {
             </Card>
           ))}
         </div>
-
-        <div className="mt-16 p-8 bg-gradient-card rounded-2xl shadow-elegant">
-          <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center flex-shrink-0">
-              <GitBranch className="w-6 h-6 text-accent-foreground" />
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Nahtlose Integration</h3>
-              <p className="text-muted-foreground">
-                Das Kubiverse integriert sich nahtlos in Ihre bestehende Entwicklungsumgebung. 
-                Durch die Verbindung mit Bitbucket und automatisierten CI/CD-Pipelines 
-                werden Ihre Projekte automatisch deployed, sobald Sie Code in einen 
-                entsprechenden Branch pushen.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
