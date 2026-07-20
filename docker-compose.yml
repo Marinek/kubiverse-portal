@@ -29,7 +29,7 @@ services:
       - BITBUCKET_AUTH_TOKEN=gitea_admin
       - JENKINS_API_URL=http://jenkins:8080/jenkins
       - JENKINS_USER=admin
-      - JENKINS_AUTH_TOKEN=11e375bd7a10f38d4e4cc3755e94b442a0
+      - JENKINS_AUTH_TOKEN=
       - LIP4_BASE_REPO_URL=http://gitea:3000/gitea_admin/fms-base-setup-4o.git
       - HELM_GITOPS_REPO_URL=http://gitea:3000/gitea_admin/gitops-repo.git
     ports:

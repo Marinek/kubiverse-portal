@@ -1,76 +1,76 @@
 global:
-  shared:
-    appEnv:
-      DATASOURCE_DRIVER: "{{datasource_driver}}"
-      DATASOURCE_PASS: "materna"
-      JAVA_OPTS: "-Xmx1G"
-      TOMCAT_PROXY_PORT: "443"
-      TOMCAT_SCHEME: "https"
-      MAILSERVER_HOST: "mailpit-smtp-svc.{{project_name}}.svc.cluster.local"
-      MAILSERVER_PORT: "1025"
-    migrationEnv:
-      FLYWAY_PASSWORD: "materna"
-      FLYWAY_PLACEHOLDER_REPLACEMENT: "true"
-      FLYWAY_PLACEHOLDER_PREFIX: "$${"
-      FLYWAY_CLEAN_DISABLED: "false"
-    migrationSql: []
+shared:
+appEnv:
+DATASOURCE_DRIVER: "{{datasource_driver}}"
+DATASOURCE_PASS: ""
+JAVA_OPTS: "-Xmx1G"
+TOMCAT_PROXY_PORT: "443"
+TOMCAT_SCHEME: "https"
+MAILSERVER_HOST: "mailpit-smtp-svc.{{project_name}}.svc.cluster.local"
+MAILSERVER_PORT: "1025"
+migrationEnv:
+FLYWAY_PASSWORD: "
+FLYWAY_PLACEHOLDER_REPLACEMENT: "true"
+FLYWAY_PLACEHOLDER_PREFIX: "$${"
+FLYWAY_CLEAN_DISABLED: "false"
+migrationSql: []
 
 instances:
-  develop:
-    image: artifact.materna.net:10046/{{build_image_name}}
-    tag: develop
-    observeDigest: true
-    ingress:
-    - service: develop-develop-svc
-      host: {{project_name}}.fms-kubiverse.materna.net
-      path: /develop
-    services:
-    - name: develop
-      port: 8080
-      targetPort: 8080
-    probes:
-      livenessPath: /develop/service/manage/lip/v1/health/simple
-      readinessPath: /develop/service/manage/lip/v1/health/simple
-    migration:
-      enabled: true
-      migrationSql: []
-      env:
-        FLYWAY_URL: "{{datasource_url}}" 
-        FLYWAY_USER: "DEVELOP"
-    env:
-      DATASOURCE_URL: "{{datasource_url}}"
-      DATASOURCE_USER: "DEVELOP"
-      LIP_BASE_URL: "https://{{project_name}}.fms-kubiverse.materna.net/develop"
-      LIP_CONTEXT_PATH: "develop"
-  
-  mailpit:
-    image: artifact.materna.net:10099/axllent/mailpit
-    tag: latest
-    observeDigest: false
-    containerPort: 8025
-    migration:
-      enabled: false
-    ingress:
-    - service: mailpit-gui-svc
-      host: {{project_name}}.fms-kubiverse.materna.net
-      path: /mailpit
-      servicePort: 8025
-    services:
-    - name: smtp
-      port: 1025
-      targetPort: 1025
-    - name: gui
-      port: 8025
-      targetPort: 8025
-    resources:
-      requests:
-        cpu: "50m"
-        memory: "128Mi"
-      limits:
-        cpu: "100m"
-        memory: "256Mi"
-    env:
-      MP_WEBROOT: "/mailpit"
+develop:
+image: artifact.net:10046/{{build_image_name}}
+tag: develop
+observeDigest: true
+ingress:
+- service: develop-develop-svc
+host: {{project_name}}
+path: /develop
+services:
+- name: develop
+port: 8080
+targetPort: 8080
+probes:
+livenessPath: /develop/service/manage/lip/v1/health/simple
+readinessPath: /develop/service/manage/lip/v1/health/simple
+migration:
+enabled: true
+migrationSql: []
+env:
+FLYWAY_URL: "{{datasource_url}}"
+FLYWAY_USER: "DEVELOP"
+env:
+DATASOURCE_URL: "{{datasource_url}}"
+DATASOURCE_USER: "DEVELOP"
+LIP_BASE_URL: "https://{{project_name}}"
+LIP_CONTEXT_PATH: "develop"
+
+mailpit:
+image:
+tag: latest
+observeDigest: false
+containerPort: 8025
+migration:
+enabled: false
+ingress:
+- service: mailpit-gui-svc
+host: {{project_name}}
+path: /mailpit
+servicePort: 8025
+services:
+- name: smtp
+port: 1025
+targetPort: 1025
+- name: gui
+port: 8025
+targetPort: 8025
+resources:
+requests:
+cpu: "50m"
+memory: "128Mi"
+limits:
+cpu: "100m"
+memory: "256Mi"
+env:
+MP_WEBROOT: "/mailpit"
 
 {{dbms}}-db:
-  enabled: true
+enabled: true
