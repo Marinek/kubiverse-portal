@@ -6,3 +6,5 @@ Dockerfile*
 .env
 */dist
 */build
+*.tsbuildinfo
+**/*.tsbuildinfo
