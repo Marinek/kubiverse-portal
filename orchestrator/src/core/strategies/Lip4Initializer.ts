@@ -79,7 +79,8 @@ export class Lip4Initializer implements IProjectInitializer {
                 await this.vcsService.pushWorkspace(targetDir, bitbucketRepoUrl, this.config.LIP4_BASE_REPO_BRANCH);
             },
             compensate: async () => {
-                await this.vcsService.deleteRepository(payload.project_name);
+                // Bitbucket repositories should not be deleted, even if subsequent steps fail.
+                console.log(`[Rollback] Skipping deletion of Bitbucket repository for ${payload.project_name}`);
             }
         });
 
