@@ -4,7 +4,7 @@ import projectRoutes from './api/routes/project.routes';
 const app = express();
 app.use(express.json());
 
-app.use('/api/v1/projects', projectRoutes);
+app.use('/orchestrator/api/v1/projects', projectRoutes);
 
 const PORT = process.env.PORT || 3001;
 

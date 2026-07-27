@@ -62,7 +62,7 @@ export function ProjectInitWizard({ open, onOpenChange }: ProjectInitWizardProps
   useEffect(() => {
     if (!activeJobId) return;
 
-    const sse = new EventSource(`/api/v1/projects/status/${activeJobId}`);
+    const sse = new EventSource(`/orchestrator/api/v1/projects/status/${activeJobId}`);
     
     sse.onmessage = (e) => {
       const data = JSON.parse(e.data);
@@ -93,7 +93,7 @@ export function ProjectInitWizard({ open, onOpenChange }: ProjectInitWizardProps
     setLogs([]);
     setActiveJobId(null);
     try {
-      const endpoint = isChaosTest ? '/api/v1/projects/init-fail-test' : '/api/v1/projects/init';
+      const endpoint = isChaosTest ? '/orchestrator/api/v1/projects/init-fail-test' : '/orchestrator/api/v1/projects/init';
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
