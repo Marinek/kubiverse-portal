@@ -60,9 +60,13 @@ export class BitbucketService implements IVersionControlService {
         
         const { BITBUCKET_USER, BITBUCKET_AUTH_TOKEN } = this.config;
         
-        const authUrl = repoUrl.replace('https://', `https://${BITBUCKET_USER}:${BITBUCKET_AUTH_TOKEN}@`).replace('http://', `http://${BITBUCKET_USER}:${BITBUCKET_AUTH_TOKEN}@`);
+        const encodedUser = encodeURIComponent(BITBUCKET_USER);
+        const encodedToken = encodeURIComponent(BITBUCKET_AUTH_TOKEN);
+        const authUrl = repoUrl
+            .replace('https://', `https://${encodedUser}:${encodedToken}@`)
+            .replace('http://', `http://${encodedUser}:${encodedToken}@`);
         
-        await execAsync(`git remote add origin ${authUrl}`, { cwd: localPath });
+        await execAsync(`git remote add origin "${authUrl}"`, { cwd: localPath });
         await execAsync(`git branch -M ${branch}`, { cwd: localPath });
         await execAsync(`git push -u origin ${branch}`, { cwd: localPath });
         await execAsync(`git remote remove origin`, { cwd: localPath });

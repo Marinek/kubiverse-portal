@@ -50,12 +50,18 @@ export class HelmGitOpsService implements IGitOpsService {
     async cloneRegistry(): Promise<string> {
         let repoUrl = this.config.HELM_GITOPS_REPO_URL;
         const { BITBUCKET_USER, BITBUCKET_AUTH_TOKEN } = this.config;
-        repoUrl = repoUrl.replace('https://', `https://${BITBUCKET_USER}:${BITBUCKET_AUTH_TOKEN}@`).replace('http://', `http://${BITBUCKET_USER}:${BITBUCKET_AUTH_TOKEN}@`);
+        
+        const encodedUser = encodeURIComponent(BITBUCKET_USER);
+        const encodedToken = encodeURIComponent(BITBUCKET_AUTH_TOKEN);
+        repoUrl = repoUrl
+            .replace('https://', `https://${encodedUser}:${encodedToken}@`)
+            .replace('http://', `http://${encodedUser}:${encodedToken}@`);
 
         const localPath = path.resolve(process.cwd(), 'tmp_workspaces', `gitops_${Date.now()}_${Math.random().toString(36).substring(7)}`);
         
-        console.log(`[GitOps] Cloning GitOps Registry from ${repoUrl} to ${localPath}`);
-        await execAsync(`git clone ${repoUrl} ${localPath}`);
+        const logUrl = repoUrl.replace(/\/\/[^:]+:[^@]+@/, '//***:***@');
+        console.log(`[GitOps] Cloning GitOps Registry from ${logUrl} to ${localPath}`);
+        await execAsync(`git clone "${repoUrl}" "${localPath}"`);
         
         // Set git configs dynamically from centralized AppConfig
         await execAsync(`git config user.email "${this.config.GIT_AUTHOR_EMAIL}"`, { cwd: localPath });
