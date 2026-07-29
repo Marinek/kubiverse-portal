@@ -11,8 +11,24 @@ export class LocalGitService implements ILocalGitService {
     constructor(private config: AppConfig) {}
 
     async cloneTemplate(repoUrl: string, targetPath: string): Promise<void> {
-        console.log(`[Git] Cloning ${repoUrl} into ${targetPath}`);
-        await execAsync(`git clone ${repoUrl} ${targetPath}`);
+        let finalUrl = repoUrl;
+        
+        if (repoUrl.startsWith('http://') || repoUrl.startsWith('https://')) {
+            const parsedUrl = new URL(repoUrl);
+            if (!parsedUrl.username) {
+                const { BITBUCKET_USER, BITBUCKET_AUTH_TOKEN } = this.config;
+                if (BITBUCKET_USER && BITBUCKET_AUTH_TOKEN) {
+                    parsedUrl.username = encodeURIComponent(BITBUCKET_USER);
+                    parsedUrl.password = encodeURIComponent(BITBUCKET_AUTH_TOKEN);
+                    finalUrl = parsedUrl.toString();
+                }
+            }
+        }
+
+        const logUrl = finalUrl.replace(/\/\/[^:]+:[^@]+@/, '//***:***@');
+        console.log(`[Git] Cloning ${logUrl} into ${targetPath}`);
+        
+        await execAsync(`git clone "${finalUrl}" "${targetPath}"`);
     }
 
     async removeGitHistory(targetPath: string): Promise<void> {
