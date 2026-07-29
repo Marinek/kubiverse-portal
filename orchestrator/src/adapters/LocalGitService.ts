@@ -16,8 +16,12 @@ export class LocalGitService implements ILocalGitService {
         if (repoUrl.startsWith('http://') || repoUrl.startsWith('https://')) {
             const parsedUrl = new URL(repoUrl);
             if (!parsedUrl.username) {
-                const { BITBUCKET_USER, BITBUCKET_AUTH_TOKEN } = this.config;
-                if (BITBUCKET_USER && BITBUCKET_AUTH_TOKEN) {
+                const { BITBUCKET_USER, BITBUCKET_AUTH_TOKEN, BITBUCKET_API_URL } = this.config;
+                
+                // Only inject Bitbucket credentials if the target is actually Bitbucket!
+                const isBitbucketTarget = BITBUCKET_API_URL && parsedUrl.hostname === new URL(BITBUCKET_API_URL).hostname;
+                
+                if (isBitbucketTarget && BITBUCKET_USER && BITBUCKET_AUTH_TOKEN) {
                     parsedUrl.username = encodeURIComponent(BITBUCKET_USER);
                     parsedUrl.password = encodeURIComponent(BITBUCKET_AUTH_TOKEN);
                     finalUrl = parsedUrl.toString();
