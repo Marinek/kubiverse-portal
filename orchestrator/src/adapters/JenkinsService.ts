@@ -2,7 +2,7 @@ import { ICICDService } from '../core/ports/ICICDService';
 import { AppConfig } from '../core/config';
 
 export class JenkinsService implements ICICDService {
-    constructor(private config: AppConfig) {}
+    constructor(private config: AppConfig) { }
 
     private getHeaders() {
         const { JENKINS_USER, JENKINS_AUTH_TOKEN } = this.config;
@@ -14,7 +14,7 @@ export class JenkinsService implements ICICDService {
     async createFolderIfNotExists(folderName: string): Promise<void> {
         const { JENKINS_API_URL } = this.config;
         const headers = this.getHeaders();
-        
+
         console.log(`[Jenkins] Checking if folder exists: ${folderName}`);
         const checkRes = await fetch(`${JENKINS_API_URL}/job/${folderName}/api/json`, { headers });
 
@@ -23,7 +23,7 @@ export class JenkinsService implements ICICDService {
             const formData = new URLSearchParams();
             formData.append('name', folderName);
             formData.append('mode', 'com.cloudbees.hudson.plugins.folder.Folder');
-            
+
             const createRes = await fetch(`${JENKINS_API_URL}/createItem`, {
                 method: 'POST',
                 headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -41,15 +41,20 @@ export class JenkinsService implements ICICDService {
 
         const { JENKINS_API_URL, JENKINS_TEMPLATE_JOB_NAME } = this.config;
         const headers = this.getHeaders();
-        
+
         console.log(`[Jenkins] Fetching template job XML...`);
         const templateRes = await fetch(`${JENKINS_API_URL}/job/${JENKINS_TEMPLATE_JOB_NAME}/config.xml`, { headers });
         if (!templateRes.ok) throw new Error("Could not fetch Jenkins template XML.");
-        
+
         let xml = await templateRes.text();
 
-        console.log(`[Jenkins] Injecting Bitbucket Repo URL into XML...`);
+        console.log(`[Jenkins] Injecting Bitbucket Repo details into XML...`);
+        // Support for standard Git plugin
         xml = xml.replace(/<remote>.*?<\/remote>/g, `<remote>${repoUrl}</remote>`);
+        // Support for Bitbucket Branch Source plugin
+        const { BITBUCKET_PROJECT_KEY } = this.config;
+        xml = xml.replace(/<repoOwner>.*?<\/repoOwner>/g, `<repoOwner>${BITBUCKET_PROJECT_KEY}</repoOwner>`);
+        xml = xml.replace(/<repository>.*?<\/repository>/g, `<repository>${jobName}</repository>`);
 
         console.log(`[Jenkins] Creating job: ${jobName} in folder: ${folderName}`);
         const createRes = await fetch(`${JENKINS_API_URL}/job/${folderName}/createItem?name=${jobName}`, {
@@ -66,7 +71,8 @@ export class JenkinsService implements ICICDService {
         console.log(`[Jenkins] Triggering initial branch scan for ${folderName}/${jobName}`);
         await fetch(`${JENKINS_API_URL}/job/${folderName}/job/${jobName}/build`, {
             method: 'POST',
-            headers: this.getHeaders()
+            headers: this.getHeaders(),
+            redirect: 'manual' // Jenkins returns a 302 to the queue item, often with a malformed URL. We don't need to follow it.
         });
     }
 
