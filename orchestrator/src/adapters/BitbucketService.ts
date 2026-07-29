@@ -71,4 +71,23 @@ export class BitbucketService implements IVersionControlService {
         await execAsync(`git push -u origin ${branch}`, { cwd: localPath });
         await execAsync(`git remote remove origin`, { cwd: localPath });
     }
+
+    async setDefaultBranch(name: string, branch: string): Promise<void> {
+        const { BITBUCKET_API_URL, BITBUCKET_USER, BITBUCKET_AUTH_TOKEN, BITBUCKET_PROJECT_KEY } = this.config;
+        console.log(`[Bitbucket] Setting default branch for ${name} to ${branch}`);
+        
+        const auth = Buffer.from(`${BITBUCKET_USER}:${BITBUCKET_AUTH_TOKEN}`).toString('base64');
+        const response = await fetch(`${BITBUCKET_API_URL}/projects/${BITBUCKET_PROJECT_KEY}/repos/${name}/branches/default`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Basic ${auth}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: `refs/heads/${branch}` })
+        });
+
+        if (!response.ok) {
+            console.error(`[Bitbucket] Warning: Failed to set default branch to ${branch}: ${await response.text()}`);
+        }
+    }
 }

@@ -77,6 +77,8 @@ export class Lip4Initializer implements IProjectInitializer {
             execute: async () => {
                 bitbucketRepoUrl = await this.vcsService.createRepository(payload.project_name);
                 await this.vcsService.pushWorkspace(targetDir, bitbucketRepoUrl, this.config.LIP4_BASE_REPO_BRANCH);
+                // Force Bitbucket to set this branch as the default (otherwise it stubbornly assumes 'master')
+                await this.vcsService.setDefaultBranch(payload.project_name, this.config.LIP4_BASE_REPO_BRANCH);
             },
             compensate: async () => {
                 // Bitbucket repositories should not be deleted, even if subsequent steps fail.
