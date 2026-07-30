@@ -14,18 +14,18 @@ export function getDriverForDBMS(dbms: 'oracle' | 'mysql' | 'mariadb' | 'postgre
 
 export function getUrlForDBMS(dbms: 'oracle' | 'mysql' | 'mariadb' | 'postgres', projectName: string): string {
     // Generate dynamic host and db name based on the project namespace
-    const host = `${projectName}-${dbms}-db`;
+    const host = `${projectName}.svc.cluster.local`;
     const dbName = projectName.replace(/-/g, '_');
-    
+
     switch (dbms) {
         case 'oracle':
-            return `jdbc:oracle:thin:@${host}:1521:${dbName}`;
+            return `jdbc:oracle:thin:@//oracle-db.${host}:1521/XEPDB1`;
         case 'mysql':
-            return `jdbc:mysql://${host}:3306/${dbName}`;
+            return `jdbc:mysql://mysql-db.${host}:3306/${dbName}_DEVELOP`;
         case 'mariadb':
-            return `jdbc:mariadb://${host}:3306/${dbName}`;
+            return `jdbc:mariadb://maria-db${host}:3306/${dbName}_DEVELOP`;
         case 'postgres':
-            return `jdbc:postgresql://${host}:5432/${dbName}`;
+            return `jdbc:postgresql://postgres-db.${host}:5432/${dbName}_DEVELOP`;
         default:
             throw new Error(`Unsupported DBMS type: ${dbms}`);
     }
