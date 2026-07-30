@@ -53,8 +53,11 @@ export class JenkinsService implements ICICDService {
         xml = xml.replace(/<remote>.*?<\/remote>/g, `<remote>${repoUrl}</remote>`);
         // Support for Bitbucket Branch Source plugin
         const { BITBUCKET_PROJECT_KEY } = this.config;
+        const repoSlug = jobName.toLowerCase().replace(/[^a-z0-9_.-]/g, '-');
         xml = xml.replace(/<repoOwner>.*?<\/repoOwner>/g, `<repoOwner>${BITBUCKET_PROJECT_KEY}</repoOwner>`);
-        xml = xml.replace(/<repository>.*?<\/repository>/g, `<repository>${jobName}</repository>`);
+        xml = xml.replace(/<repository>.*?<\/repository>/g, `<repository>${repoSlug}</repository>`);
+        // Clear the source ID to prevent Jenkins from caching the template's SCM state
+        xml = xml.replace(/<source class="com\.cloudbees.*?">[\s\S]*?<id>.*?<\/id>/g, (match) => match.replace(/<id>.*?<\/id>/, '<id></id>'));
 
         console.log(`[Jenkins] Creating job: ${jobName} in folder: ${folderName}`);
         const createRes = await fetch(`${JENKINS_API_URL}/job/${folderName}/createItem?name=${jobName}`, {
