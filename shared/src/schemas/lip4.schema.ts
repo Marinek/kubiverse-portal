@@ -25,6 +25,8 @@ export const Lip4Schema = z.object({
     // Centralized fallback logic for build_image_name. Docker requires image names to be fully lowercase.
     return {
         ...data,
+        project_slug: data.project_name.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+        deployment_name: data.deployment_name ? data.deployment_name.toLowerCase().replace(/[^a-z0-9-]/g, '-') : undefined,
         build_image_name: (data.build_image_name || data.deployment_name || data.project_name).toLowerCase()
     };
 });
