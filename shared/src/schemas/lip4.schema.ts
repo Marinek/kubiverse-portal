@@ -22,10 +22,10 @@ export const Lip4Schema = z.object({
     path: ["deployment_name"]
 })
 .transform((data) => {
-    // Centralized fallback logic for build_image_name. 
+    // Centralized fallback logic for build_image_name. Docker requires image names to be fully lowercase.
     return {
         ...data,
-        build_image_name: data.build_image_name || data.deployment_name || data.project_name
+        build_image_name: (data.build_image_name || data.deployment_name || data.project_name).toLowerCase()
     };
 });
 
