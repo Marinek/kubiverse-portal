@@ -13,6 +13,10 @@ services:
     environment:
       - ARGOCD_URL=http://mock:12004
       - SPRING_PROFILES_ACTIVE=no-db
+      - BITBUCKET_API_URL=${BITBUCKET_API_URL:-http://mock:12004/rest/api/1.0}
+      - BITBUCKET_PROJECT=${BITBUCKET_PROJECT:-FMS}
+      - BITBUCKET_TEMPLATE_REPO=${BITBUCKET_TEMPLATE_REPO:-http://mock:12004/scm/fms/template.git}
+      - BITBUCKET_TOKEN=${BITBUCKET_TOKEN:-mock-token}
     ports:
       - "8080:8080"
     depends_on:
@@ -23,6 +27,13 @@ services:
     build:
       context: ./portal
       dockerfile: Dockerfile
+      args:
+        - VITE_ARGOCD_UI_URL=http://localhost:12004
+        - VITE_TEAMS_CHAT_URL=https://example.com
+        - VITE_DOCS_DEPLOYMENT_GUIDE_URL=https://confluence.example.com/deployment
+        - VITE_DOCS_GIT_CONVENTIONS_URL=https://confluence.example.com/git
+        - VITE_DOCS_CICD_PIPELINE_URL=https://confluence.example.com/cicd
+        - VITE_DOCS_TROUBLESHOOTING_URL=https://confluence.example.com/troubleshooting
     ports:
       - "80:80"
     depends_on:

@@ -67,7 +67,6 @@ export const Footer = () => {
             <h4 className="font-semibold mb-4">Support</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><a href="mailto:devops@company.de" className="hover:text-primary transition-colors">DevOps-Team</a></li>
-              <li><a href="mailto:dev-support@company.de" className="hover:text-primary transition-colors">Development Support</a></li>
               <li><a href="mailto:it-support@company.de" className="hover:text-primary transition-colors">IT-Support</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Troubleshooting</a></li>
             </ul>

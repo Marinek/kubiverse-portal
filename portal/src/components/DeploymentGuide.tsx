@@ -1,26 +1,68 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { toast } from "sonner";
 import {
   ArrowRight,
   CheckCircle2,
   GitBranch,
+  FolderGit2,
   Rocket,
   Globe,
   Settings,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from "lucide-react";
 
 export const DeploymentGuide = () => {
+  const [projectName, setProjectName] = useState("");
+  const [isBootstrapping, setIsBootstrapping] = useState(false);
+  const [feedback, setFeedback] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  const handleBootstrap = async () => {
+    setFeedback(null);
+    if (!projectName.trim()) {
+      toast.error("Bitte einen Projektnamen eingeben");
+      setFeedback({ message: "Bitte einen Projektnamen eingeben", type: "error" });
+      return;
+    }
+
+    setIsBootstrapping(true);
+    try {
+      const response = await fetch("/kubiverse/api/bootstrap", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ projectName: projectName.trim() }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Bootstrap fehlgeschlagen");
+      }
+
+      toast.success("Projekt erfolgreich bootstrapped!");
+      setFeedback({ message: "Projekt erfolgreich bootstrapped!", type: "success" });
+      setProjectName("");
+    } catch (error: any) {
+      toast.error(`Fehler: ${error.message}`);
+      setFeedback({ message: `Fehler: ${error.message}`, type: "error" });
+    } finally {
+      setIsBootstrapping(false);
+    }
+  };
   const steps = [
     {
       number: "01",
-      icon: Settings,
-      title: "Projekt in Bitbucket anlegen",
-      description: "Erstellen Sie ein neues Repository oder aktualisieren Sie ein bestehendes Projekt in Bitbucket",
+      icon: FolderGit2,
+      title: "Neues Projekt in Bitbucket anlegen",
+      description: "Dieser Schritt dient nur zur Erstellung neuer Git-Projekte. Falls bereits ein Projekt existiert, kann dieser Schritt übersprungen werden.",
       details: [
-        "Repository erstellen oder Code aktualisieren",
-        "Deployment-Konfiguration hinzufügen",
+        "Neues Repository aus Template erstellen",
+        "Deployment-Konfiguration ist bereits enthalten",
         "Branch-Struktur nach internen Konventionen"
       ]
     },
@@ -120,6 +162,27 @@ export const DeploymentGuide = () => {
                       </li>
                     ))}
                   </ul>
+                  {index === 0 && (
+                    <div className="mt-6 flex flex-col gap-3">
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <Input
+                          placeholder="Projektname eingeben"
+                          value={projectName}
+                          onChange={(e) => setProjectName(e.target.value)}
+                          className="max-w-xs"
+                        />
+                        <Button onClick={handleBootstrap} disabled={isBootstrapping}>
+                          {isBootstrapping && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          Projekt initialisieren
+                        </Button>
+                      </div>
+                      {feedback && (
+                        <div className={`p-3 rounded-md text-sm border max-w-lg ${feedback.type === 'success' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
+                          {feedback.message}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
