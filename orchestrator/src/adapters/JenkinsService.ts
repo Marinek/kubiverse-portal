@@ -35,9 +35,7 @@ export class JenkinsService implements ICICDService {
     }
 
     async createPipelineJob(folderName: string, jobName: string, repoUrl: string): Promise<void> {
-        if (jobName.includes('fail-test')) {
-            throw new Error("[Chaos Test] Simulating Jenkins API outage!");
-        }
+
 
         const { JENKINS_API_URL, JENKINS_TEMPLATE_JOB_NAME } = this.config;
         const headers = this.getHeaders();
@@ -53,7 +51,11 @@ export class JenkinsService implements ICICDService {
         xml = xml.replace(/<remote>.*?<\/remote>/g, `<remote>${repoUrl}</remote>`);
         // Support for Bitbucket Branch Source plugin
         const { BITBUCKET_PROJECT_KEY } = this.config;
-        const repoSlug = jobName.toLowerCase().replace(/[^a-z0-9_.-]/g, '-');
+        const repoSlug = jobName
+            .toLowerCase()
+            .replace(/[^a-z0-9_.-]/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-+|-+$/g, '');
         xml = xml.replace(/<repoOwner>.*?<\/repoOwner>/g, `<repoOwner>${BITBUCKET_PROJECT_KEY}</repoOwner>`);
         xml = xml.replace(/<repository>.*?<\/repository>/g, `<repository>${repoSlug}</repository>`);
         // Clear the source ID to prevent Jenkins from caching the template's SCM state

@@ -14,7 +14,11 @@ export function getDriverForDBMS(dbms: 'oracle' | 'mysql' | 'mariadb' | 'postgre
 
 export function getUrlForDBMS(dbms: 'oracle' | 'mysql' | 'mariadb' | 'postgres', projectName: string): string {
     // Generate dynamic host and db name based on the project namespace (enforce RFC 1123 for K8s)
-    const k8sSlug = projectName.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    const k8sSlug = projectName
+        .toLowerCase()
+        .replace(/[^a-z0-9-]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-+|-+$/g, '');
     const host = `${k8sSlug}.svc.cluster.local`;
     const dbName = projectName.replace(/-/g, '_');
 

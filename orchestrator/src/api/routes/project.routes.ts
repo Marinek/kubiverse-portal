@@ -30,32 +30,6 @@ router.post('/init', (req, res) => {
   return res.json({ jobId });
 });
 
-router.post('/init-fail-test', (req, res) => {
-  const result = ProjectInitSchema.safeParse(req.body);
-  
-  if (!result.success) {
-    return res.status(400).json({ error: result.error.errors });
-  }
-
-  const payload = result.data;
-  const jobId = Math.random().toString(36).substring(7);
-  
-  // Add a special fail flag into project_name
-  payload.project_name = `${payload.project_name}-fail-test`;
-
-  // Async background execution
-  (async () => {
-    try {
-      console.log(`[Job ${jobId}] Started CHAOS TEST for project type: ${payload.project_type}`);
-      const initializer = ProjectInitializerFactory.createInitializer(payload.project_type);
-      await initializer.initialize(payload, jobId);
-    } catch (error) {
-      console.error(`[Job ${jobId}] Chaos test failed (expected).`, error);
-    }
-  })();
-  
-  return res.json({ jobId });
-});
 
 router.get('/status/:jobId', (req, res) => {
   const { jobId } = req.params;

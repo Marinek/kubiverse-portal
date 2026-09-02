@@ -6,7 +6,7 @@ DATASOURCE_PASS: ""
 JAVA_OPTS: "-Xmx1G"
 TOMCAT_PROXY_PORT: "443"
 TOMCAT_SCHEME: "https"
-MAILSERVER_HOST: "mailpit-smtp-svc.{{project_name}}.svc.cluster.local"
+MAILSERVER_HOST: "mailpit-smtp-svc.{{project_slug}}.svc.cluster.local"
 MAILSERVER_PORT: "1025"
 migrationEnv:
 FLYWAY_PASSWORD: "
@@ -22,7 +22,7 @@ tag: develop
 observeDigest: true
 ingress:
 - service: develop-develop-svc
-host: {{project_name}}
+host: {{project_slug}}
 path: /develop
 services:
 - name: develop
@@ -40,7 +40,7 @@ FLYWAY_USER: "DEVELOP"
 env:
 DATASOURCE_URL: "{{datasource_url}}"
 DATASOURCE_USER: "DEVELOP"
-LIP_BASE_URL: "https://{{project_name}}"
+LIP_BASE_URL: "https://{{project_slug}}"
 LIP_CONTEXT_PATH: "develop"
 
 mailpit:
@@ -52,7 +52,7 @@ migration:
 enabled: false
 ingress:
 - service: mailpit-gui-svc
-host: {{project_name}}
+host: {{project_slug}}
 path: /mailpit
 servicePort: 8025
 services:

@@ -45,6 +45,7 @@ export class Lip4Initializer implements IProjectInitializer {
                 
                 const envTemplateSrc = path.resolve(__dirname, '../../templates/env.hbs');
                 const jenkinsTemplateSrc = path.resolve(__dirname, '../../templates/Jenkinsfile.hbs');
+                const readmeTemplateSrc = path.resolve(__dirname, '../../templates/README.md.hbs');
                 
                 const projectDir = payload.project_directory || 'project';
                 const envDestDir = path.join(targetDir, projectDir);
@@ -52,12 +53,15 @@ export class Lip4Initializer implements IProjectInitializer {
                 
                 const envDest = path.join(envDestDir, '.env');
                 const jenkinsDest = path.join(targetDir, 'Jenkinsfile');
+                const readmeDest = path.join(targetDir, 'README.md');
                 
                 await fs.promises.copyFile(envTemplateSrc, envDest);
                 await fs.promises.copyFile(jenkinsTemplateSrc, jenkinsDest);
+                await fs.promises.copyFile(readmeTemplateSrc, readmeDest);
                 
                 await this.templateService.processFile(envDest, templateContext);
                 await this.templateService.processFile(jenkinsDest, templateContext);
+                await this.templateService.processFile(readmeDest, templateContext);
                 await this.localGitService.initGitRepository(targetDir);
             },
             compensate: async () => {
