@@ -1,9 +1,28 @@
 services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_DB=kubiverse-portal
+      - POSTGRES_USER=${DB_USERNAME:-kubiverse}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-kubiverse-local}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d kubiverse-portal"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - kubiverse
+    restart: unless-stopped
+
   mock:
     build:
       context: ./mock
     ports:
       - "12004:12004"
+    networks:
+      - kubiverse
     restart: unless-stopped
 
   server:
@@ -12,7 +31,16 @@ services:
       dockerfile: Dockerfile
     environment:
       - ARGOCD_URL=http://mock:12004
-      - SPRING_PROFILES_ACTIVE=no-db
+      - SPRING_PROFILES_ACTIVE=db
+      - DB_URL=jdbc:postgresql://db:5432/kubiverse-portal
+      - DB_USERNAME=${DB_USERNAME:-kubiverse}
+      - DB_PASSWORD=${DB_PASSWORD:-kubiverse-local}
+      - SECURE_SHARE_MASTER_KEY=${SECURE_SHARE_MASTER_KEY:?SECURE_SHARE_MASTER_KEY muss gesetzt sein, z. B. in .env (openssl rand -base64 32)}
+      - SECURE_SHARE_MASTER_KEY_ID=${SECURE_SHARE_MASTER_KEY_ID:-k1}
+      - SECURE_SHARE_PREVIOUS_MASTER_KEY=${SECURE_SHARE_PREVIOUS_MASTER_KEY:-}
+      - SECURE_SHARE_PREVIOUS_MASTER_KEY_ID=${SECURE_SHARE_PREVIOUS_MASTER_KEY_ID:-}
+      # Only the portal's nginx may set X-Forwarded-For
+      - SECURE_SHARE_TRUSTED_PROXIES=172\.28\.0\.10
       - BITBUCKET_API_URL=${BITBUCKET_API_URL:-http://mock:12004/rest/api/1.0}
       - BITBUCKET_PROJECT=${BITBUCKET_PROJECT:-FMS}
       - BITBUCKET_TEMPLATE_REPO=${BITBUCKET_TEMPLATE_REPO:-http://mock:12004/scm/fms/template.git}
@@ -20,7 +48,12 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mock
+      db:
+        condition: service_healthy
+      mock:
+        condition: service_started
+    networks:
+      - kubiverse
     restart: unless-stopped
 
   portal:
@@ -39,4 +72,16 @@ services:
     depends_on:
       - mock
       - server
+    networks:
+      kubiverse:
+        ipv4_address: 172.28.0.10
     restart: unless-stopped
+
+networks:
+  kubiverse:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+
+volumes:
+  db-data:

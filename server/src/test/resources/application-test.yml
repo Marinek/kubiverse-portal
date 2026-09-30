@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:secureshare;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=10000
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+secure-share:
+  # Test-only key ("0123456789abcdef0123456789abcdef")
+  master-key: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+  master-key-id: test-k1

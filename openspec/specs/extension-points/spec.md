@@ -7,8 +7,9 @@ Dokumentiert die im Code vorhandenen Stellen, an denen das System konfiguriert o
 | Erweiterungspunkt | Ort | Stand im Code |
 |---|---|---|
 | Externe Systeme per Konfiguration | `application.yml` (`argocd.*`, `bitbucket.*`), `ArgoCdProperties` | aktiv |
+| Secure-Share-Grenzwerte und Schlüssel | `application.yml` (`secure-share.*`), `SecureShareProperties` | aktiv |
 | Frontend-Links per Build-Argument | `VITE_*` in `portal/dockerfile`, `Header`, `DocumentationSection` | aktiv |
-| Datenbank (PostgreSQL/JPA) | `build.gradle`, `spring.datasource`/`spring.jpa` in `application.yml` | vorbereitet, keine Entitäten/Repositories |
+| Datenbank (PostgreSQL/JPA) | `build.gradle`, `spring.datasource`/`spring.jpa` in `application.yml` | aktiv für Secure Share (Entität `SecureShare`), um weitere Entitäten erweiterbar |
 | Benutzerverwaltung | `CustomUserDetailsService` (Kommentar: "Will be replaced by actual database lookup logic later") | Platzhalter |
 | Token-Ausstellung | `JwtTokenUtil.generateToken` | vorhanden, nicht aufgerufen |
 | Methodenbasierte Autorisierung | `@EnableMethodSecurity` in `SecurityConfig` | aktiviert, keine Annotationen genutzt |
@@ -16,7 +17,7 @@ Dokumentiert die im Code vorhandenen Stellen, an denen das System konfiguriert o
 | Objekt-Mapping | MapStruct 1.5.5 in `build.gradle` | Abhängigkeit vorhanden, keine Mapper |
 | Generische API-Antwort | `dto/ApiResponse<T>` (`message`, `data`) | vorhanden, nicht verwendet |
 | Fehlerbehandlung | `GlobalExceptionHandler` | aktiv, um weitere `@ExceptionHandler` erweiterbar |
-| Content-Security-Policy | `nginx.conf` (Kommentar: "CSP ggf. projektspezifisch schärfen") | nicht gesetzt |
+| Content-Security-Policy | `portal/security-headers.conf` | aktiv, um weitere Quellen erweiterbar |
 | UI-Komponentenbibliothek | `portal/src/components/ui` (shadcn/ui, `components.json`) | aktiv |
 | Routen | `portal/src/App.tsx` | aktiv |
 | Mock-Endpunkte | `mock/server.js` | aktiv |
@@ -42,10 +43,10 @@ Das Portal SHALL ArgoCD-UI-Link, Teams-Chat-Link und die vier Dokumentationslink
 - **THEN** verweist der Troubleshooting-Link auf die neue URL
 
 ### Requirement: Aktivierbare Datenbankanbindung
-Das Backend SHALL eine PostgreSQL-Anbindung über Spring Data JPA vorhalten, die durch Verlassen des Profils `no-db` aktiviert wird (`ddl-auto: update`, `show-sql: true`).
+Das Backend SHALL eine PostgreSQL-Anbindung über Spring Data JPA vorhalten, die durch Verlassen des Profils `no-db` aktiviert wird (`ddl-auto: update`, `show-sql: true`). Die Verbindung MUST über `DB_URL`, `DB_USERNAME` und `DB_PASSWORD` konfigurierbar sein.
 
 #### Scenario: Start ohne Profil no-db
-- **WHEN** `SPRING_PROFILES_ACTIVE` auf einen anderen Wert als `no-db` gesetzt wird
+- **WHEN** `SPRING_PROFILES_ACTIVE` auf einen anderen Wert als `no-db` gesetzt wird und `DB_URL` nicht gesetzt ist
 - **THEN** versucht das Backend, sich mit `jdbc:postgresql://localhost:12002/kubiverse-portal` zu verbinden
 
 ### Requirement: Erweiterbare Security-Bausteine

@@ -30,3 +30,6 @@ server/bin/**
 mock/node_modules/**
 
 *.log
+
+# Local environment (contains secrets such as SECURE_SHARE_MASTER_KEY)
+.env

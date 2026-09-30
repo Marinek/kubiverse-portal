@@ -9,18 +9,19 @@ Beschreibt das im Code umgesetzte Sicherheitskonzept von Backend, Portal (nginx/
 - Spring Security mit zustandsloser Session-Verwaltung und JWT-Filter (`SecurityConfig`, `JwtAuthenticationFilter`, `JwtTokenUtil`, `CustomUserDetailsService`)
 - Bearer-Token-Authentifizierung gegenüber ArgoCD und Bitbucket, Token-Authentifizierung für Git (JGit)
 - Fehlerbehandlung ohne Stacktraces nach außen (`GlobalExceptionHandler`)
-- nginx-Härtung (`server_tokens off`, Sicherheitsheader)
+- nginx-Härtung (`server_tokens off`, Sicherheitsheader inklusive Content-Security-Policy auf allen Antworten über `security-headers.conf`)
 - Externe Links im Frontend mit `rel="noopener noreferrer"`
+- Secure Share: verschlüsselte Speicherung, Pflicht-Header `X-Kubiverse-Client` gegen Cross-Site-Anfragen, Anfragebegrenzung pro Client-IP, Ermittlung der Client-IP nur über vertrauenswürdige Proxys, Audit-Logger `AUDIT` (siehe `secure-share`)
 
 **Aus dem Code erkennbare offene Punkte (Ist-Zustand, keine Soll-Vorgabe):**
 
 - Es sind keine URL- oder Methoden-Autorisierungsregeln konfiguriert (`authorizeHttpRequests` fehlt, keine `@PreAuthorize`-Annotationen); alle Endpunkte sind ohne Authentifizierung aufrufbar.
 - Es existiert kein Endpunkt, der JWTs ausstellt (`JwtTokenUtil.generateToken` wird nicht aufgerufen); das Frontend sendet keine Tokens.
-- `jwt.secret` und Datenbank-Zugangsdaten stehen im Klartext in `application.yml`; Token-Standardwerte lauten `mock-token` bzw. `mock-key-12345`.
+- `jwt.secret` steht im Klartext in `application.yml`; für Datenbank-Zugangsdaten sind dort lokale Standardwerte hinterlegt (per `DB_*` überschreibbar); Token-Standardwerte lauten `mock-token` bzw. `mock-key-12345`.
 - Der einzige Benutzer (`admin`) ist fest im Code hinterlegt.
 - CORS ist im Backend deaktiviert (Kommentar: "Consider specific cors config for production"); im Mock ist CORS für alle Ursprünge aktiv.
 - Der Bootstrap-Endpunkt gibt Exception-Meldungen an den Client zurück; `projectName` wird außer auf Nicht-Leere nicht validiert.
-- nginx setzt keine Content-Security-Policy (Kommentar: "CSP ggf. projektspezifisch schärfen"). Die auf Server-Ebene definierten Sicherheitsheader werden in den `location`-Blöcken für `/index.html` und statische Assets nicht wirksam, da diese eigene `add_header`-Direktiven besitzen (nginx-Vererbungsregel).
+- Die Content-Security-Policy erlaubt `'unsafe-inline'` für Styles (Inline-Styles in bestehenden Komponenten).
 - Der Header lädt das ArgoCD-Logo von einer externen URL (`argo-cd.readthedocs.io`).
 
 ## Requirements
@@ -81,12 +82,24 @@ Der `GlobalExceptionHandler` SHALL bei unerwarteten Fehlern nur generische Meldu
 - **THEN** erhält der Client nur `{"message":"Internal server error","details":"An unexpected error occurred"}`
 
 ### Requirement: HTTP-Sicherheitsheader im Portal
-nginx SHALL `server_tokens off` setzen und auf Server-Ebene die Header `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin` und `Permissions-Policy: camera=(), microphone=(), geolocation=()` definieren.
+nginx SHALL `server_tokens off` setzen und für alle Antworten – einschließlich `/index.html`, statischer Assets und des SPA-Fallbacks – die Header `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=()` sowie eine `Content-Security-Policy` setzen. Die Content-Security-Policy MUST Skripte ausschließlich vom eigenen Ursprung zulassen, Verbindungen (`connect-src`) auf den eigenen Ursprung beschränken, `object-src 'none'` setzen und Einbettung nur durch den eigenen Ursprung erlauben.
 
 #### Scenario: Auslieferung über SPA-Fallback
 - **WHEN** eine Route über `location /` ausgeliefert wird
-- **THEN** enthält die Antwort die vier Sicherheitsheader
+- **THEN** enthält die Antwort die Sicherheitsheader einschließlich `Content-Security-Policy`
 - **AND** die nginx-Version wird nicht preisgegeben
+
+#### Scenario: Auslieferung von index.html und Assets
+- **WHEN** `/index.html` oder ein statisches Asset ausgeliefert wird
+- **THEN** enthält die Antwort neben den Cache-Headern alle Sicherheitsheader
+
+#### Scenario: Fremdes Skript
+- **WHEN** eine Seite versucht, ein Skript von einem fremden Ursprung oder ein Inline-Skript auszuführen
+- **THEN** blockiert der Browser die Ausführung
+
+#### Scenario: Bestehende externe Ressourcen
+- **WHEN** das Portal Web-Fonts von Google Fonts und das ArgoCD-Logo lädt
+- **THEN** werden diese durch die Content-Security-Policy nicht blockiert
 
 ### Requirement: Sichere externe Links im Frontend
 Das Frontend SHALL alle Links, die in einem neuen Tab geöffnet werden (`target="_blank"`), mit `rel="noopener noreferrer"` versehen.
@@ -96,8 +109,33 @@ Das Frontend SHALL alle Links, die in einem neuen Tab geöffnet werden (`target=
 - **THEN** hat die Zielseite keinen Zugriff auf `window.opener` und erhält keinen Referrer
 
 ### Requirement: Clientseitige Datenhaltung
-Das Frontend SHALL ausschließlich Favoriten (Applikationsnamen) im `localStorage` speichern und keine Zugangsdaten oder Tokens clientseitig ablegen.
+Das Frontend SHALL ausschließlich Favoriten (Applikationsnamen) im `localStorage` speichern und keine Zugangsdaten, Tokens, Freigabelinks, Share-Passwörter oder Share-Inhalte clientseitig dauerhaft ablegen.
 
 #### Scenario: Gespeicherte Daten
 - **WHEN** der Nutzer Favoriten setzt
 - **THEN** enthält `localStorage` nur den Schlüssel `kubiverse-favorites` mit einem JSON-Array von Namen
+
+#### Scenario: Nutzung von Secure Share
+- **WHEN** der Nutzer einen Share erstellt oder abruft
+- **THEN** werden weder Freigabelink, Zugriffsgeheimnis, Passwort noch Inhalt in `localStorage` oder `sessionStorage` gespeichert
+
+### Requirement: Schutz der Secure-Share-Endpunkte vor Cross-Site-Anfragen
+Das Backend SHALL Anfragen an Secure-Share-Endpunkte nur mit dem Header `X-Kubiverse-Client: portal` verarbeiten. Dadurch lösen browserseitige Cross-Origin-Anfragen einen CORS-Preflight aus, den das Backend nicht freigibt.
+
+#### Scenario: Formular-Post von fremder Website
+- **WHEN** eine fremde Website den Browser eines Nutzers veranlasst, eine Anfrage an `/kubiverse/api/shares` zu senden
+- **THEN** wird kein Share erstellt und kein Inhalt ausgeliefert
+
+### Requirement: Ermittlung der Client-IP-Adresse
+Das Backend SHALL die Client-IP-Adresse für Anfragebegrenzung und Audit-Logs aus Weiterleitungs-Headern nur dann übernehmen, wenn die Anfrage von einer als vertrauenswürdig konfigurierten Proxy-Adresse stammt; andernfalls MUST die Adresse der direkten Gegenstelle verwendet werden.
+
+#### Scenario: Gefälschter Weiterleitungs-Header
+- **WHEN** ein Client von einer nicht vertrauenswürdigen Adresse einen `X-Forwarded-For`-Header mitsendet
+- **THEN** ignoriert das Backend diesen Header für Anfragebegrenzung und Audit-Logs
+
+### Requirement: Log-Hygiene
+Das Backend SHALL sicherstellen, dass keine Log-Ausgabe – einschließlich Fehler- und Stacktrace-Ausgaben – Share-Inhalte, Dateinamen, Passwörter, Zugriffsgeheimnisse oder Schlüsselmaterial enthält.
+
+#### Scenario: Fehler bei der Verarbeitung
+- **WHEN** beim Erstellen oder Abrufen eines Shares eine Ausnahme auftritt und protokolliert wird
+- **THEN** enthält der Log-Eintrag keine vertraulichen Share-Daten
