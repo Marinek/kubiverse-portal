@@ -41,10 +41,6 @@ services:
       - SECURE_SHARE_PREVIOUS_MASTER_KEY_ID=${SECURE_SHARE_PREVIOUS_MASTER_KEY_ID:-}
       # Only the portal's nginx may set X-Forwarded-For
       - SECURE_SHARE_TRUSTED_PROXIES=172\.28\.0\.10
-      - BITBUCKET_API_URL=${BITBUCKET_API_URL:-http://mock:12004/rest/api/1.0}
-      - BITBUCKET_PROJECT=${BITBUCKET_PROJECT:-FMS}
-      - BITBUCKET_TEMPLATE_REPO=${BITBUCKET_TEMPLATE_REPO:-http://mock:12004/scm/fms/template.git}
-      - BITBUCKET_TOKEN=${BITBUCKET_TOKEN:-mock-token}
     ports:
       - "8080:8080"
     depends_on:
