@@ -73,7 +73,7 @@ export class HelmGitOpsService implements IGitOpsService {
     async commitAndPush(localPath: string, payload: ProjectInitPayload): Promise<void> {
         console.log(`[GitOps] Generating Helm values for project ${payload.project_name}`);
         
-        const projectDir = path.join(localPath, 'projects', payload.project_name);
+        const projectDir = path.join(localPath, 'projects', payload.project_name).toLowerCase();
         await fs.promises.mkdir(projectDir, { recursive: true });
 
         // Copy the external template
