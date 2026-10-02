@@ -29,4 +29,11 @@ server/build/**
 server/bin/**
 mock/node_modules/**
 
+# Node.js
+node_modules/
+dist/
+.env
+
 *.log
+*.tsbuildinfo
+**/*.tsbuildinfo

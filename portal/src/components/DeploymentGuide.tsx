@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,8 +11,10 @@ import {
   Settings,
   ExternalLink
 } from "lucide-react";
+import { ProjectInitWizard } from "./ProjectInitWizard";
 
 export const DeploymentGuide = () => {
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
   const steps = [
     {
       number: "01",
@@ -135,13 +138,14 @@ export const DeploymentGuide = () => {
             Projekt in wenigen Minuten im Kubiverse deployed.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="secondary" size="lg" className="group">
+            <Button variant="secondary" size="lg" className="group" onClick={() => setIsWizardOpen(true)}>
               Deployment starten
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </div>
       </div>
+      <ProjectInitWizard open={isWizardOpen} onOpenChange={setIsWizardOpen} />
     </section>
   );
 };

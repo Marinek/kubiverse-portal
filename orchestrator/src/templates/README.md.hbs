@@ -1,0 +1,26 @@
+# {{project_name}}
+## notwendige Anpassungen für konkrete Projekte
+- COMPOSE_PROJECT_NAME in docker-compose.yml anpassen
+- Datasource Eigenschaften in project/.env anpassen
+- Datasource Driver sowie Supporter in project/lipbase/custom/application/config/lip.yml anpassen
+- Falls das Projekt auf eine vorhandenen Datenbankstruktur aufbaut, können in project/Ablage/Datenmodell/pre-migration SQL-Skripte ablegen. Diese werden vor dem Start der LIP per Flyway ausgeführt.
+## Lokale Ausführung mit Docker Compose
+Für den lokalen Start der Anwendung wird das Docker‑Compose Setup im Projektverzeichnis verwendet.
+Schritte
+```
+cd project
+# Container starten (inkl. Build)
+docker compose up --build -d
+# Logs der Anwendung anzeigen
+docker compose logs -f app
+```
+--build sorgt dafür, dass Images neu gebaut werden.
+-d startet die Container im Hintergrund.
+-f zeigt den Log-Output in Echtzeit an.
+Der Service‑Name app muss dem Namen im docker-compose.yml entsprechen.
+### Anwendung aufrufen
+Die Anwendung ist über folgende URL aufrufbar:
+- Default Login: {{project_name}}.fms-kubiverse.materna.net/develop
+- Mailpit: {{project_name}}.fms-kubiverse.materna.net/mailpit
+### Datenbank cleanen
+Um alle Objekte in der Datenbank zu löschen, muss in der Datei das Property clean-schema in der Datei project/lipbase/config/lip-lipdev.yml auf true gesetzt werden.
