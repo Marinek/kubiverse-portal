@@ -8,7 +8,6 @@ import {
   ArrowRight,
   CheckCircle2,
   GitBranch,
-  FolderGit2,
   Rocket,
   Globe,
   Settings,
@@ -57,12 +56,12 @@ export const DeploymentGuide = () => {
   const steps = [
     {
       number: "01",
-      icon: FolderGit2,
-      title: "Neues Projekt in Bitbucket anlegen",
-      description: "Dieser Schritt dient nur zur Erstellung neuer Git-Projekte. Falls bereits ein Projekt existiert, kann dieser Schritt übersprungen werden.",
+      icon: Settings,
+      title: "Projekt in Bitbucket anlegen",
+      description: "Erstellen Sie ein neues Repository oder aktualisieren Sie ein bestehendes Projekt in Bitbucket",
       details: [
-        "Neues Repository aus Template erstellen",
-        "Deployment-Konfiguration ist bereits enthalten",
+        "Repository erstellen oder Code aktualisieren",
+        "Deployment-Konfiguration hinzufügen",
         "Branch-Struktur nach internen Konventionen"
       ]
     },
@@ -165,8 +164,8 @@ export const DeploymentGuide = () => {
                   {index === 0 && (
                     <div className="mt-6 flex flex-col gap-3">
                       <div className="flex flex-col sm:flex-row gap-3">
-                        <Input
-                          placeholder="Projektname eingeben"
+                        <Input 
+                          placeholder="Projektname eingeben" 
                           value={projectName}
                           onChange={(e) => setProjectName(e.target.value)}
                           className="max-w-xs"
