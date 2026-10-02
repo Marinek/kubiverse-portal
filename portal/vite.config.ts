@@ -13,8 +13,8 @@ export default defineConfig(({ mode }) => {
       host: "::",
       port: 8080,
       proxy: {
-        "/kubiverse/api": {
-          target: "http://localhost:8080",
+        "/orchestrator/api": {
+          target: "http://localhost:3001",
           changeOrigin: true,
         },
       },
@@ -25,6 +25,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
+        "@kubiverse/shared": path.resolve(__dirname, "../shared/src/index.ts"),
       },
     },
   };

@@ -77,6 +77,56 @@ app.get('/api/v1/applications', (req, res) => {
     }, 500);
 });
 
+// --- Bitbucket Mock API Translator ---
+const GITEA_API = 'http://gitea:3000/api/v1';
+
+app.post('/bitbucket/rest/api/1.0/projects/:projectKey/repos', async (req, res) => {
+    const repoName = req.body.name;
+    console.log(`[Mock] Intercepted Bitbucket Create Repo: ${repoName}. Forwarding to Gitea...`);
+    
+    try {
+        const giteaRes = await fetch(`${GITEA_API}/user/repos`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': req.headers.authorization
+            },
+            body: JSON.stringify({ name: repoName, private: false })
+        });
+        const giteaBody = await giteaRes.text();
+        console.log(`[Mock] Gitea response: ${giteaRes.status} ${giteaBody}`);
+    } catch (e) {
+        console.error('[Mock] Error calling Gitea:', e);
+    }
+
+    // Return Bitbucket format
+    res.json({
+        links: {
+            clone: [
+                { name: 'http', href: `http://gitea:3000/gitea_admin/${repoName}.git` }
+            ]
+        }
+    });
+});
+
+app.delete('/bitbucket/rest/api/1.0/projects/:projectKey/repos/:repoName', async (req, res) => {
+    const repoName = req.params.repoName;
+    console.log(`[Mock] Intercepted Bitbucket Delete Repo: ${repoName}. Forwarding to Gitea...`);
+    
+    try {
+        await fetch(`${GITEA_API}/repos/gitea_admin/${repoName}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': req.headers.authorization
+            }
+        });
+    } catch (e) {
+        console.error('[Mock] Error calling Gitea:', e);
+    }
+
+    res.status(204).send();
+});
+
 app.listen(PORT, () => {
     console.log(`ArgoCD Mock Server running on http://localhost:${PORT}`);
 });

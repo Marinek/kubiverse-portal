@@ -4,6 +4,9 @@ WORKDIR /app
 
 # Nur die Manifeste für Dependencies kopieren (bessere Layer-Caches)
 COPY package*.json ./
+COPY portal/package*.json ./portal/
+COPY shared/package*.json ./shared/
+COPY orchestrator/package*.json ./orchestrator/
 
 # Installiere Dependencies reproduzierbar
 RUN npm ci
@@ -34,7 +37,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY security-headers.conf /etc/nginx/snippets/security-headers.conf
 
 # Gebautes Frontend nach Nginx Webroot
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/portal/dist /usr/share/nginx/html
 
 # Standard-Port
 EXPOSE 80

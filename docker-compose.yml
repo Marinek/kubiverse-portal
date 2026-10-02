@@ -29,6 +29,26 @@ services:
       - kubiverse
     restart: unless-stopped
 
+  orchestrator:
+    build:
+      context: .
+      dockerfile: orchestrator/Dockerfile
+    environment:
+      - BITBUCKET_API_URL=http://mock:12004/bitbucket/rest/api/1.0
+      - BITBUCKET_USER=gitea_admin
+      - BITBUCKET_AUTH_TOKEN=gitea_admin
+      - JENKINS_API_URL=http://jenkins:8080/jenkins
+      - JENKINS_USER=admin
+      - JENKINS_AUTH_TOKEN=
+      - LIP4_BASE_REPO_URL=http://gitea:3000/gitea_admin/fms-base-setup-4o.git
+      - HELM_GITOPS_REPO_URL=http://gitea:3000/gitea_admin/gitops-repo.git
+    ports:
+      - "3001:3001"
+    depends_on:
+      - gitea
+      - jenkins
+    restart: unless-stopped
+
   portal:
     build:
       context: ./portal
@@ -45,9 +65,27 @@ services:
     depends_on:
       - mock
       - server
-    networks:
-      kubiverse:
-        ipv4_address: 172.28.0.10
+      - orchestrator
+    restart: unless-stopped
+
+  gitea:
+    image: gitea/gitea:1.21.0
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    restart: always
+    ports:
+      - "3000:3000"
+      - "2222:22"
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    user: root
+    ports:
+      - "8081:8080"
+      - "50000:50000"
+    environment:
+      - JENKINS_OPTS=--prefix=/jenkins
     restart: unless-stopped
 
 networks:
