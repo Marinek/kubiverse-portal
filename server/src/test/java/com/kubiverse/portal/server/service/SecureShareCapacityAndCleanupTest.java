@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.kubiverse.portal.server.TestClock;
 import com.kubiverse.portal.server.exception.ShareServiceUnavailableException;
-import com.kubiverse.portal.server.repository.SecureShareRepository;
 import com.kubiverse.portal.server.service.SecureShareService.CreateCommand;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,13 +15,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(properties = {
+    "secure-share.master-key=MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
+    "secure-share.master-key-id=test-k1",
         "secure-share.capacity.max-shares=2",
         "secure-share.capacity.max-total-bytes=100"
 })
-@ActiveProfiles("test")
 @Import(TestClock.Config.class)
 @ExtendWith(OutputCaptureExtension.class)
 class SecureShareCapacityAndCleanupTest {
@@ -32,13 +31,13 @@ class SecureShareCapacityAndCleanupTest {
     @Autowired
     private ShareCleanupJob cleanupJob;
     @Autowired
-    private SecureShareRepository repository;
+    private InMemorySecureShareStore store;
     @Autowired
     private TestClock clock;
 
     @BeforeEach
     void setUp() {
-        repository.deleteAll();
+        store.clear();
         clock.reset();
     }
 
@@ -82,8 +81,8 @@ class SecureShareCapacityAndCleanupTest {
 
         cleanupJob.deleteExpiredShares();
 
-        assertThat(repository.count()).isEqualTo(1);
-        assertThat(repository.findAll().get(0).getExpiresAt()).isEqualTo(TestClock.START.plus(Duration.ofHours(24)));
+        assertThat(store.size()).isEqualTo(1);
+        assertThat(store.snapshot().get(0).getExpiresAt()).isEqualTo(TestClock.START.plus(Duration.ofHours(24)));
         assertThat(output).containsOnlyOnce("reason=EXPIRED clientIp=system");
     }
 }

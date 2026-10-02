@@ -49,6 +49,6 @@ public class SecureShareProperties {
         @Positive
         private int maxShares = 1000;
         @Positive
-        private long maxTotalBytes = 1_073_741_824L;
+        private long maxTotalBytes = 268_435_456L;
     }
 }

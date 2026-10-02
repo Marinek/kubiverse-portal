@@ -42,13 +42,6 @@ Das Portal SHALL ArgoCD-UI-Link, Teams-Chat-Link und die vier Dokumentationslink
 - **WHEN** das Portal-Image mit geändertem `VITE_DOCS_TROUBLESHOOTING_URL` neu gebaut wird
 - **THEN** verweist der Troubleshooting-Link auf die neue URL
 
-### Requirement: Aktivierbare Datenbankanbindung
-Das Backend SHALL eine PostgreSQL-Anbindung über Spring Data JPA vorhalten, die durch Verlassen des Profils `no-db` aktiviert wird (`ddl-auto: update`, `show-sql: true`). Die Verbindung MUST über `DB_URL`, `DB_USERNAME` und `DB_PASSWORD` konfigurierbar sein.
-
-#### Scenario: Start ohne Profil no-db
-- **WHEN** `SPRING_PROFILES_ACTIVE` auf einen anderen Wert als `no-db` gesetzt wird und `DB_URL` nicht gesetzt ist
-- **THEN** versucht das Backend, sich mit `jdbc:postgresql://localhost:12002/kubiverse-portal` zu verbinden
-
 ### Requirement: Erweiterbare Security-Bausteine
 Das Backend SHALL die Bausteine für eine Token-basierte Authentifizierung (`JwtTokenUtil` mit Erzeugung und Validierung, austauschbarer `UserDetailsService`, aktivierte Method Security) bereitstellen, auch wenn Login-Endpunkt und Autorisierungsregeln noch fehlen.
 

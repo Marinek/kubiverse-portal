@@ -7,13 +7,13 @@ It follows strict layering, clean code principles, and focuses on OWASP security
 - Java 21
 - Spring Boot 3.4.x
 - Gradle
-- PostgreSQL
+- Process-local in-memory Secure Share storage
 - Spring Security (JWT Stateless Authentication)
 - Lombok & MapStruct
 
 ## Getting Started
 
-1. Ensure the PostgreSQL database and pgAdmin are running via the root `docker-compose.yml`:
+1. Start the mock and backend from the repository root:
    ```bash
    cd ../
    docker-compose up -d
@@ -27,8 +27,8 @@ It follows strict layering, clean code principles, and focuses on OWASP security
 ## Architecture
 - `controller`: REST APIs
 - `service`: Business logic
-- `repository`: DB access
-- `entity`: Database models
+- process-local in-memory Secure Share storage
+- `entity`: Secure Share data models
 - `dto`: API requests/responses
 - `mapper`: MapStruct interfaces
 - `security`: JWT and Security configs
@@ -46,11 +46,10 @@ docker run --rm -v "$PWD":/app -w /app gradle:9-jdk21-alpine gradle test --no-da
 ```
 
 ## Secure Share
-Secure Share requires a database, i.e. any profile other than `no-db`. In the `no-db` profile its endpoints answer with HTTP 503.
+Secure Share is available in the default Spring profile and stores encrypted shares and metadata only in the backend process memory. All shares are lost when the process or container stops or restarts. Operate exactly one backend instance; multiple replicas do not share data. The default content budget is 256 MiB (`268435456` bytes). Set container/JVM memory higher than this limit to leave room for encryption buffers, metadata and the rest of the application.
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `DB_URL` / `DB_USERNAME` / `DB_PASSWORD` | local PostgreSQL on port 12002 | Database connection |
 | `SECURE_SHARE_MASTER_KEY` | – (required) | Base64-encoded 256-bit master key |
 | `SECURE_SHARE_MASTER_KEY_ID` | `k1` | Identifier stored with each share |
 | `SECURE_SHARE_PREVIOUS_MASTER_KEY` / `_ID` | – | Previous key during rotation |
@@ -58,7 +57,7 @@ Secure Share requires a database, i.e. any profile other than `no-db`. In the `n
 | `SECURE_SHARE_RATE_LIMIT_CREATE_PER_HOUR` | `20` | Share creations per client IP and hour |
 | `SECURE_SHARE_RATE_LIMIT_ACCESS_PER_HOUR` | `60` | Lookups and downloads per client IP and hour |
 | `SECURE_SHARE_MAX_SHARES` | `1000` | Maximum number of active shares |
-| `SECURE_SHARE_MAX_TOTAL_BYTES` | `1073741824` | Maximum stored content in bytes (1 GB) |
+| `SECURE_SHARE_MAX_TOTAL_BYTES` | `268435456` | Maximum content in memory (256 MiB) |
 
 Generate a master key:
 ```bash
@@ -68,3 +67,14 @@ openssl rand -base64 32
 Key rotation: set the new key as `SECURE_SHARE_MASTER_KEY` with a new `SECURE_SHARE_MASTER_KEY_ID`, move the old key and id to `SECURE_SHARE_PREVIOUS_MASTER_KEY` / `SECURE_SHARE_PREVIOUS_MASTER_KEY_ID` and restart. After 7 days all shares encrypted with the old key have expired and the previous key can be removed.
 
 Audit events are written to the `AUDIT` logger (stdout) and never contain content, filenames, passwords or tokens.
+
+### Retired PostgreSQL Volume
+The Compose configuration no longer declares PostgreSQL and does not automatically remove volumes left by older deployments. To remove only the legacy database volume after confirming its data is no longer needed:
+
+```bash
+docker volume ls --filter label=com.docker.compose.volume=db-data
+docker volume inspect <exact-volume-name>
+docker volume rm <exact-volume-name>
+```
+
+**Warning:** the final command permanently deletes that volume's data. Inspect the exact volume and verify it belongs to the retired Kubiverse deployment before removal; do not use a broad volume-prune command.

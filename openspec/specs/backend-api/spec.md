@@ -122,7 +122,7 @@ Alle Endpunkte unter `/kubiverse/api/shares` SHALL den Header `X-Kubiverse-Clien
 - **THEN** antwortet das Backend mit HTTP 429 und einem `Retry-After`-Header in Sekunden
 
 #### Scenario: Kapazität erschöpft oder Feature nicht verfügbar
-- **WHEN** die globale Kapazität erreicht ist oder das Backend im Profil `no-db` läuft
+- **WHEN** die globale Kapazität erreicht ist
 - **THEN** antwortet das Backend mit HTTP 503 im Format `ErrorResponse`
 
 #### Scenario: Keine Zwischenspeicherung

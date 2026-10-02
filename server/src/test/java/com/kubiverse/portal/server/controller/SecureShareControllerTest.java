@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kubiverse.portal.server.TestClock;
-import com.kubiverse.portal.server.repository.SecureShareRepository;
 import com.kubiverse.portal.server.service.SecureShareService;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,15 +22,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 
-@SpringBootTest
+@SpringBootTest(properties = {
+    "secure-share.master-key=MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
+    "secure-share.master-key-id=test-k1"
+})
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 @Import(TestClock.Config.class)
 class SecureShareControllerTest {
 
@@ -42,15 +42,12 @@ class SecureShareControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private SecureShareRepository repository;
-    @Autowired
     private TestClock clock;
 
     private String ip;
 
     @BeforeEach
     void setUp() {
-        repository.deleteAll();
         clock.reset();
         int n = IP_COUNTER.incrementAndGet();
         ip = "10.40." + (n / 250) + "." + (n % 250 + 1);
@@ -107,7 +104,6 @@ class SecureShareControllerTest {
     void rejectsRequestWithoutClientHeader() throws Exception {
         mockMvc.perform(multipart("/kubiverse/api/shares").param("text", "secret"))
                 .andExpect(status().isBadRequest());
-        assertThat(repository.count()).isZero();
     }
 
     @Test

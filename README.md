@@ -16,9 +16,6 @@ The `server` is the backend of the application, based on **Java 21** and **Sprin
 The `mock` is a lightweight server written in **Node.js** and **Express.js**, designed to simulate the ArgoCD APIs. It ensures that the backend (`server`) can be developed and run independently without requiring a real, active ArgoCD cluster or database connection.
 - **Accessible at:** `http://localhost:12004`
 
-### 4. Database
-A **PostgreSQL** container (`db`) stores Secure Share data. It is only reachable inside the Compose network; data is kept in the `db-data` volume.
-
 ---
 
 ## Getting Started
@@ -46,4 +43,16 @@ Once all containers are up and running, you can access the **Portal** in your br
 
 ## Secure Share
 
-Via the **Secure Share** menu item, users can share a text secret (up to 10,000 characters) or a file (up to 10 MB) through a one-time link. Shares expire after 1 hour, 24 hours, 3 days or 7 days, can be limited to a number of downloads (default: 1, "burn after read") and can be protected with an additional password. Content is stored encrypted and deleted automatically. Configuration options are listed in [server/README.md](server/README.md#secure-share).
+Via the **Secure Share** menu item, users can share a text secret (up to 10,000 characters) or a file (up to 10 MB) through a one-time link. Shares expire after 1 hour, 24 hours, 3 days or 7 days, can be limited to a number of downloads (default: 1, "burn after read") and can be protected with an additional password. Encrypted content and metadata exist only in backend process memory. All active shares are lost when that process or container stops or restarts; run exactly one backend instance. The default content budget is 256 MiB, so configure container/JVM memory with additional headroom for encryption buffers, metadata and the application itself. Configuration options are listed in [server/README.md](server/README.md#secure-share).
+
+### Retired PostgreSQL Volume
+
+Removing the database service from Compose does not remove an existing `db-data` volume. No volume is deleted automatically. If the old database data is no longer needed, first list and inspect the exact Compose volume, then remove only that volume:
+
+```bash
+docker volume ls --filter label=com.docker.compose.volume=db-data
+docker volume inspect <exact-volume-name>
+docker volume rm <exact-volume-name>
+```
+
+**Warning:** removing the volume permanently deletes its PostgreSQL data. Verify the inspected volume belongs to the retired Kubiverse Compose project and that its data is no longer required before running the removal command.

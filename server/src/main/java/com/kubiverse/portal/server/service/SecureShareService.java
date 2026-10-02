@@ -1,6 +1,5 @@
 package com.kubiverse.portal.server.service;
 
-import com.kubiverse.portal.server.config.SecureShareProperties;
 import com.kubiverse.portal.server.entity.SecureShare;
 import com.kubiverse.portal.server.entity.ShareType;
 import com.kubiverse.portal.server.exception.ShareNotAvailableException;
@@ -8,7 +7,6 @@ import com.kubiverse.portal.server.exception.SharePasswordException;
 import com.kubiverse.portal.server.exception.ShareServiceUnavailableException;
 import com.kubiverse.portal.server.exception.ShareTooLargeException;
 import com.kubiverse.portal.server.exception.ShareValidationException;
-import com.kubiverse.portal.server.repository.SecureShareRepository;
 import com.kubiverse.portal.server.service.AuditLogger.Action;
 import com.kubiverse.portal.server.service.AuditLogger.DeletionReason;
 import com.kubiverse.portal.server.service.ShareCryptoService.DataKey;
@@ -27,14 +25,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Profile("!no-db")
 public class SecureShareService {
 
     public static final long MAX_FILE_BYTES = 10_485_760L;
@@ -52,21 +47,19 @@ public class SecureShareService {
             "3d", Duration.ofDays(3),
             "7d", Duration.ofDays(7));
 
-    private final SecureShareRepository repository;
+    private final InMemorySecureShareStore store;
     private final ShareCryptoService crypto;
     private final RateLimiter rateLimiter;
     private final AuditLogger audit;
-    private final SecureShareProperties properties;
     private final Clock clock;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public SecureShareService(SecureShareRepository repository, ShareCryptoService crypto, RateLimiter rateLimiter,
-            AuditLogger audit, SecureShareProperties properties, Clock clock) {
-        this.repository = repository;
+    public SecureShareService(InMemorySecureShareStore store, ShareCryptoService crypto, RateLimiter rateLimiter,
+            AuditLogger audit, Clock clock) {
+        this.store = store;
         this.crypto = crypto;
         this.rateLimiter = rateLimiter;
         this.audit = audit;
-        this.properties = properties;
         this.clock = clock;
     }
 
@@ -85,7 +78,6 @@ public class SecureShareService {
     public record RetrievedShare(ShareType type, byte[] content, String filename, boolean deleted) {
     }
 
-    @Transactional
     public CreatedShare create(CreateCommand command, String clientIp) {
         rateLimiter.check(Action.CREATE, clientIp);
 
@@ -122,7 +114,6 @@ public class SecureShareService {
         ShareType type = hasText ? ShareType.TEXT : ShareType.FILE;
         byte[] content = hasText ? command.text().getBytes(StandardCharsets.UTF_8) : command.file();
         Instant now = clock.instant();
-        ensureCapacity(content.length, now, clientIp);
 
         UUID id = UUID.randomUUID();
         String token = ShareTokens.generate();
@@ -150,7 +141,13 @@ public class SecureShareService {
             share.setRemainingDownloads(maxDownloads);
             share.setCreatedAt(now);
             share.setExpiresAt(now.plus(expiry));
-            repository.save(share);
+            cleanupExpired(now);
+            try {
+                store.save(share);
+            } catch (ShareServiceUnavailableException exception) {
+                audit.capacityExceeded(clientIp);
+                throw exception;
+            }
 
             audit.shareCreated(id, type, content.length, share.getExpiresAt(), maxDownloads, password != null,
                     clientIp);
@@ -160,86 +157,93 @@ public class SecureShareService {
         }
     }
 
-    @Transactional(readOnly = true)
     public ShareMetadata lookup(String token, String clientIp) {
         rateLimiter.check(Action.ACCESS, clientIp);
-        SecureShare share = findAvailable(token, false, clientIp);
-        return new ShareMetadata(share.getType(), share.getPasswordHash() != null, share.getExpiresAt(),
-                share.getRemainingDownloads());
+        SecureShare share = findAvailable(token, clientIp);
+        synchronized (share) {
+            ensureAvailable(share, clientIp);
+            return new ShareMetadata(share.getType(), share.getPasswordHash() != null, share.getExpiresAt(),
+                    share.getRemainingDownloads());
+        }
     }
 
-    @Transactional(noRollbackFor = SharePasswordException.class)
     public RetrievedShare retrieve(String token, String password, String clientIp) {
         rateLimiter.check(Action.ACCESS, clientIp);
-        SecureShare share = findAvailable(token, true, clientIp);
+        SecureShare share = findAvailable(token, clientIp);
+        synchronized (share) {
+            ensureAvailable(share, clientIp);
 
-        if (share.getPasswordHash() != null) {
-            String given = emptyToNull(password);
-            if (given == null || !passwordEncoder.matches(prehash(given), share.getPasswordHash())) {
-                int attempts = share.getFailedPasswordAttempts() + 1;
-                audit.passwordFailed(share.getId(), attempts, clientIp);
-                if (attempts >= MAX_PASSWORD_ATTEMPTS) {
-                    repository.delete(share);
-                    audit.shareDeleted(share.getId(), DeletionReason.PASSWORD_ATTEMPTS, clientIp);
-                } else {
-                    share.setFailedPasswordAttempts(attempts);
+            if (share.getPasswordHash() != null) {
+                String given = emptyToNull(password);
+                if (given == null || !passwordEncoder.matches(prehash(given), share.getPasswordHash())) {
+                    int attempts = share.getFailedPasswordAttempts() + 1;
+                    audit.passwordFailed(share.getId(), attempts, clientIp);
+                    if (attempts >= MAX_PASSWORD_ATTEMPTS) {
+                        store.delete(share);
+                        audit.shareDeleted(share.getId(), DeletionReason.PASSWORD_ATTEMPTS, clientIp);
+                    } else {
+                        share.setFailedPasswordAttempts(attempts);
+                    }
+                    throw new SharePasswordException();
                 }
-                throw new SharePasswordException();
+                share.setFailedPasswordAttempts(0);
             }
-            share.setFailedPasswordAttempts(0);
-        }
 
-        byte[] dek = crypto.unwrapDataKey(share.getKeyId(), share.getWrappedDek(), share.getDekIv(), share.getId());
-        byte[] content;
-        String filename = null;
-        try {
-            content = crypto.decrypt(dek, new Sealed(share.getCiphertext(), share.getContentIv()), share.getId(),
-                    Purpose.CONTENT);
-            if (share.getType() == ShareType.FILE) {
-                filename = new String(crypto.decrypt(dek,
-                        new Sealed(share.getFilenameCiphertext(), share.getFilenameIv()), share.getId(),
-                        Purpose.FILENAME), StandardCharsets.UTF_8);
+            byte[] dek = crypto.unwrapDataKey(share.getKeyId(), share.getWrappedDek(), share.getDekIv(),
+                    share.getId());
+            byte[] content;
+            String filename = null;
+            try {
+                content = crypto.decrypt(dek, new Sealed(share.getCiphertext(), share.getContentIv()), share.getId(),
+                        Purpose.CONTENT);
+                if (share.getType() == ShareType.FILE) {
+                    filename = new String(crypto.decrypt(dek,
+                            new Sealed(share.getFilenameCiphertext(), share.getFilenameIv()), share.getId(),
+                            Purpose.FILENAME), StandardCharsets.UTF_8);
+                }
+            } finally {
+                Arrays.fill(dek, (byte) 0);
             }
-        } finally {
-            Arrays.fill(dek, (byte) 0);
-        }
 
-        Integer remaining = share.getRemainingDownloads();
-        boolean consumed = false;
-        if (remaining != null) {
-            remaining = remaining - 1;
-            share.setRemainingDownloads(remaining);
-            consumed = remaining <= 0;
+            Integer remaining = share.getRemainingDownloads();
+            boolean consumed = false;
+            if (remaining != null) {
+                remaining = remaining - 1;
+                share.setRemainingDownloads(remaining);
+                consumed = remaining <= 0;
+            }
+            audit.shareRetrieved(share.getId(), remaining, clientIp);
+            if (consumed) {
+                store.delete(share);
+                audit.shareDeleted(share.getId(), DeletionReason.CONSUMED, clientIp);
+            }
+            return new RetrievedShare(share.getType(), content, filename, consumed);
         }
-        audit.shareRetrieved(share.getId(), remaining, clientIp);
-        if (consumed) {
-            repository.delete(share);
-            audit.shareDeleted(share.getId(), DeletionReason.CONSUMED, clientIp);
-        }
-        return new RetrievedShare(share.getType(), content, filename, consumed);
     }
 
-    private SecureShare findAvailable(String token, boolean forUpdate, String clientIp) {
+    private SecureShare findAvailable(String token, String clientIp) {
         Optional<SecureShare> share = Optional.empty();
         if (ShareTokens.isWellFormed(token)) {
             byte[] hash = ShareTokens.hash(token);
-            share = forUpdate ? repository.findByTokenHashForUpdate(hash) : repository.findByTokenHash(hash);
+            share = store.findByTokenHash(hash);
         }
-        Instant now = clock.instant();
-        if (share.isEmpty() || !share.get().getExpiresAt().isAfter(now)) {
+        if (share.isEmpty()) {
             audit.shareNotAvailable(clientIp);
             throw new ShareNotAvailableException();
         }
         return share.get();
     }
 
-    private void ensureCapacity(long size, Instant now, String clientIp) {
-        SecureShareProperties.Capacity capacity = properties.getCapacity();
-        if (repository.countActive(now) >= capacity.getMaxShares()
-                || repository.sumActiveSizeBytes(now) + size > capacity.getMaxTotalBytes()) {
-            audit.capacityExceeded(clientIp);
-            throw new ShareServiceUnavailableException(ShareServiceUnavailableException.CAPACITY);
+    private void ensureAvailable(SecureShare share, String clientIp) {
+        if (!store.contains(share) || !share.getExpiresAt().isAfter(clock.instant())) {
+            audit.shareNotAvailable(clientIp);
+            throw new ShareNotAvailableException();
         }
+    }
+
+    private void cleanupExpired(Instant now) {
+        store.removeExpired(now).forEach(
+                share -> audit.shareDeletedBySystem(share.getId(), DeletionReason.EXPIRED));
     }
 
     private static Duration parseExpiry(String value, List<String> errors) {

@@ -21,7 +21,7 @@ class SecureSharePropertiesTest {
         assertThat(props.getRateLimit().getCreatePerHour()).isEqualTo(20);
         assertThat(props.getRateLimit().getAccessPerHour()).isEqualTo(60);
         assertThat(props.getCapacity().getMaxShares()).isEqualTo(1000);
-        assertThat(props.getCapacity().getMaxTotalBytes()).isEqualTo(1_073_741_824L);
+        assertThat(props.getCapacity().getMaxTotalBytes()).isEqualTo(268_435_456L);
         assertThat(props.getMasterKey()).isNull();
     }
 

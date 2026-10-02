@@ -18,7 +18,6 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
@@ -26,9 +25,11 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  * Exercises the full secure share flow, including error paths, and verifies that no confidential
  * value appears in any log output.
  */
-@SpringBootTest
+@SpringBootTest(properties = {
+        "secure-share.master-key=MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
+        "secure-share.master-key-id=test-k1"
+})
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 @Import(TestClock.Config.class)
 @ExtendWith(OutputCaptureExtension.class)
 class SecureShareLogHygieneTest {

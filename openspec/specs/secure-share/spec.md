@@ -136,10 +136,10 @@ Das System SHALL für unbekannte, abgelaufene, vollständig abgerufene und gelö
 - **AND** es werden keine Informationen über den früheren Inhalt preisgegeben
 
 ### Requirement: Verschlüsselte Speicherung
-Das System SHALL Inhalte von Text-Secrets, Dateiinhalte und Dateinamen ausschließlich verschlüsselt speichern. Das Zugriffsgeheimnis aus dem Link und Passwörter MUST NOT im Klartext oder in umkehrbarer Form gespeichert werden.
+Das System SHALL Inhalte von Text-Secrets, Dateiinhalte und Dateinamen ausschließlich verschlüsselt im flüchtigen Arbeitsspeicher des Backendprozesses halten. Das System MUST NOT Secure-Share-Inhalte, Metadaten, Token-Hashes oder Passwort-Hashes in einer Datenbank, Datei oder einem persistenten Volume speichern. Das Zugriffsgeheimnis aus dem Link und Passwörter MUST NOT im Klartext oder in umkehrbarer Form gespeichert werden.
 
 #### Scenario: Einsicht in den Datenspeicher
-- **WHEN** jemand den Datenspeicher ohne den Verschlüsselungsschlüssel des Servers einsieht
+- **WHEN** jemand den flüchtigen Datenspeicher ohne den Verschlüsselungsschlüssel des Servers einsieht
 - **THEN** kann er weder Text-Secrets noch Dateiinhalte, Dateinamen, Zugriffsgeheimnisse oder Passwörter lesen
 
 #### Scenario: Fehlender Schlüssel
@@ -147,15 +147,15 @@ Das System SHALL Inhalte von Text-Secrets, Dateiinhalte und Dateinamen ausschlie
 - **THEN** nimmt Secure Share keine neuen Inhalte an
 
 ### Requirement: Automatische Löschung
-Das System SHALL Shares nach Ablauf automatisch und endgültig löschen. Die Löschung MUST spätestens 5 Minuten nach dem Ablaufzeitpunkt erfolgen. Shares, deren letzter erlaubter Abruf erfolgt ist oder deren Passwort-Fehlversuche das Limit erreicht haben, MUST sofort gelöscht werden.
+Das System SHALL Shares nach Ablauf automatisch aus dem aktiven Arbeitsspeicher entfernen. Die Entfernung MUST spätestens 5 Minuten nach dem Ablaufzeitpunkt erfolgen. Shares, deren letzter erlaubter Abruf erfolgt ist oder deren Passwort-Fehlversuche das Limit erreicht haben, MUST unmittelbar aus dem aktiven Speicher entfernt und nicht mehr abrufbar sein.
 
 #### Scenario: Löschung nach Ablauf
 - **WHEN** der Ablaufzeitpunkt eines Shares mehr als 5 Minuten zurückliegt
-- **THEN** sind Inhalt und zugehörige Daten des Shares nicht mehr gespeichert
+- **THEN** ist der Share nicht mehr im aktiven Speicher verfügbar und kann nicht abgerufen werden
 
 #### Scenario: Löschung nach letztem Abruf
 - **WHEN** der letzte erlaubte Abruf erfolgt ist
-- **THEN** werden Inhalt und zugehörige Daten des Shares unmittelbar gelöscht
+- **THEN** ist der Share unmittelbar nicht mehr abrufbar
 
 ### Requirement: Unkenntlichkeit des Zugriffsgeheimnisses
 Das System SHALL jeden Share über ein zufälliges Zugriffsgeheimnis mit mindestens 256 Bit Entropie adressieren. Das Zugriffsgeheimnis MUST NOT in Server- oder Proxy-Zugriffsprotokollen, in Audit-Logs, in Referrer-Headern oder im Browser-Speicher (`localStorage`, `sessionStorage`) landen.
@@ -176,7 +176,7 @@ Das System SHALL alle Antworten, die Inhalte oder Metadaten von Shares enthalten
 - **THEN** ist er weder im Browser-Cache noch in zwischengeschalteten Caches abrufbar
 
 ### Requirement: Missbrauchsschutz
-Das System SHALL die Nutzung pro Client-IP-Adresse begrenzen und globale Kapazitätsgrenzen durchsetzen. Die Grenzwerte MUST konfigurierbar sein und haben folgende Standardwerte: höchstens 20 Share-Erstellungen pro Stunde und IP-Adresse, höchstens 60 Aufrufe (Link öffnen und Abrufen zusammen) pro Stunde und IP-Adresse, insgesamt höchstens 1 000 aktive Shares und höchstens 1 GB gespeicherte Inhalte.
+Das System SHALL die Nutzung pro Client-IP-Adresse begrenzen und globale Kapazitätsgrenzen pro Backendprozess durchsetzen. Die Grenzwerte MUST konfigurierbar sein und haben folgende Standardwerte: höchstens 20 Share-Erstellungen pro Stunde und IP-Adresse, höchstens 60 Aufrufe (Link öffnen und Abrufen zusammen) pro Stunde und IP-Adresse, insgesamt höchstens 1 000 aktive Shares und höchstens 256 MiB gespeicherte Inhalte.
 
 #### Scenario: Zu viele Erstellungen
 - **WHEN** eine IP-Adresse das Erstellungslimit überschreitet
@@ -187,7 +187,7 @@ Das System SHALL die Nutzung pro Client-IP-Adresse begrenzen und globale Kapazit
 - **THEN** lehnt das System weitere Aufrufe mit HTTP 429 und einer Angabe ab, wann es erneut möglich ist
 
 #### Scenario: Kapazität erschöpft
-- **WHEN** die maximale Anzahl aktiver Shares oder die maximale Speichermenge erreicht ist
+- **WHEN** die maximale Anzahl aktiver Shares oder die maximale Speichermenge im Backendprozess erreicht ist
 - **THEN** lehnt das System neue Shares mit HTTP 503 ab
 - **AND** das Portal meldet, dass Secure Share vorübergehend ausgelastet ist
 
@@ -228,10 +228,13 @@ Protokollierte Ereignisse: Share erstellt (mit Typ, Größe, Ablaufzeitpunkt, ma
 - **WHEN** ein beliebiges Secure-Share-Ereignis protokolliert wird
 - **THEN** enthält weder der Audit-Eintrag noch ein anderer Log-Eintrag Inhalt, Dateiname, Passwort, Zugriffsgeheimnis oder Schlüssel
 
-### Requirement: Nicht verfügbarer Betrieb ohne Datenspeicher
-Das System SHALL Secure Share als nicht verfügbar melden, wenn das Backend ohne Datenspeicher betrieben wird. Die übrigen Funktionen des Portals MUST davon unberührt bleiben.
+### Requirement: Flüchtige Speicherung ohne Datenbank
+Das System SHALL Secure Share im Standardbetrieb ohne PostgreSQL bereitstellen. Verschlüsselte Shares und zugehörige Metadaten MUST ausschließlich während der Laufzeit des Backendprozesses verfügbar sein. Beim Beenden oder Neustarten des Backendprozesses MUST das System alle zuvor erstellten Shares verwerfen.
 
-#### Scenario: Betrieb im Profil no-db
-- **WHEN** das Backend im Profil `no-db` läuft und ein Share erstellt oder abgerufen werden soll
-- **THEN** antwortet das System mit HTTP 503
-- **AND** der Application Hub und der Projekt-Bootstrap funktionieren weiterhin
+#### Scenario: Share im laufenden Backend abrufen
+- **WHEN** ein Share erstellt und vor dem Ende des Backendprozesses abgerufen wird
+- **THEN** stehen Inhalt, Metadaten, Ablaufzeit und Abrufzähler wie spezifiziert zur Verfügung
+
+#### Scenario: Share nach Backend-Neustart
+- **WHEN** ein Share erstellt und danach der Backendprozess beendet oder neu gestartet wird
+- **THEN** ist der Share nicht mehr verfügbar und Abrufversuche liefern dieselbe HTTP-404-Antwort wie für einen unbekannten Share

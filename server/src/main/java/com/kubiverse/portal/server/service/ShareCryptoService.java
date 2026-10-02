@@ -12,7 +12,6 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
  * content with AES-256-GCM; the DEK itself is wrapped with the configured master key (KEK).
  */
 @Service
-@Profile("!no-db")
 public class ShareCryptoService {
 
     private static final String AES = "AES";

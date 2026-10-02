@@ -11,7 +11,6 @@ import com.kubiverse.portal.server.exception.ShareNotAvailableException;
 import com.kubiverse.portal.server.exception.SharePasswordException;
 import com.kubiverse.portal.server.exception.ShareTooLargeException;
 import com.kubiverse.portal.server.exception.ShareValidationException;
-import com.kubiverse.portal.server.repository.SecureShareRepository;
 import com.kubiverse.portal.server.service.SecureShareService.CreateCommand;
 import com.kubiverse.portal.server.service.SecureShareService.CreatedShare;
 import com.kubiverse.portal.server.service.SecureShareService.RetrievedShare;
@@ -34,10 +33,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest
-@ActiveProfiles("test")
+@SpringBootTest(properties = {
+    "secure-share.master-key=MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
+    "secure-share.master-key-id=test-k1"
+})
 @Import(TestClock.Config.class)
 class SecureShareServiceTest {
 
@@ -46,7 +46,7 @@ class SecureShareServiceTest {
     @Autowired
     private SecureShareService service;
     @Autowired
-    private SecureShareRepository repository;
+    private InMemorySecureShareStore store;
     @Autowired
     private TestClock clock;
 
@@ -54,7 +54,7 @@ class SecureShareServiceTest {
 
     @BeforeEach
     void setUp() {
-        repository.deleteAll();
+        store.clear();
         clock.reset();
         ip = nextIp();
     }
@@ -106,7 +106,7 @@ class SecureShareServiceTest {
                 .isInstanceOf(ShareValidationException.class)
                 .satisfies(e -> assertThat(((ShareValidationException) e).getFieldErrors())
                         .anyMatch(error -> error.startsWith(field + ":")));
-        assertThat(repository.count()).isZero();
+        assertThat(store.size()).isZero();
     }
 
     static Stream<Arguments> invalidCommands() {
@@ -140,7 +140,7 @@ class SecureShareServiceTest {
 
         assertThatThrownBy(() -> service.create(file(tooLarge, "big.bin"), ip))
                 .isInstanceOf(ShareTooLargeException.class);
-        assertThat(repository.count()).isZero();
+        assertThat(store.size()).isZero();
     }
 
     @Test
@@ -150,7 +150,7 @@ class SecureShareServiceTest {
         CreatedShare textShare = service.create(text(secret, null, null, password), ip);
         service.create(file("file-content-xyz".getBytes(StandardCharsets.UTF_8), "geheim-report.txt"), ip);
 
-        for (SecureShare share : repository.findAll()) {
+        for (SecureShare share : store.snapshot()) {
             String stored = new String(share.getCiphertext(), StandardCharsets.ISO_8859_1)
                     + (share.getFilenameCiphertext() == null ? ""
                             : new String(share.getFilenameCiphertext(), StandardCharsets.ISO_8859_1))
@@ -196,7 +196,7 @@ class SecureShareServiceTest {
                 .isInstanceOf(ShareNotAvailableException.class);
 
         clock.advance(Duration.ofHours(1));
-        assertThat(repository.count()).isEqualTo(1);
+        assertThat(store.size()).isEqualTo(1);
         assertThatThrownBy(() -> service.lookup(created.token(), ip))
                 .isInstanceOf(ShareNotAvailableException.class);
         assertThatThrownBy(() -> service.retrieve(created.token(), null, ip))
@@ -213,7 +213,7 @@ class SecureShareServiceTest {
 
         assertThat(new String(retrieved.content(), StandardCharsets.UTF_8)).isEqualTo("secret");
         assertThat(retrieved.deleted()).isTrue();
-        assertThat(repository.count()).isZero();
+        assertThat(store.size()).isZero();
         assertThatThrownBy(() -> service.retrieve(created.token(), null, ip))
                 .isInstanceOf(ShareNotAvailableException.class);
     }
@@ -264,13 +264,13 @@ class SecureShareServiceTest {
                 .isInstanceOf(SharePasswordException.class);
         assertThatThrownBy(() -> service.retrieve(created.token(), null, ip))
                 .isInstanceOf(SharePasswordException.class);
-        SecureShare afterFailures = repository.findAll().get(0);
+        SecureShare afterFailures = store.findByTokenHash(ShareTokens.hash(created.token())).orElseThrow();
         assertThat(afterFailures.getFailedPasswordAttempts()).isEqualTo(2);
         assertThat(afterFailures.getRemainingDownloads()).isEqualTo(2);
 
         service.retrieve(created.token(), "password1", ip);
 
-        SecureShare afterSuccess = repository.findAll().get(0);
+        SecureShare afterSuccess = store.findByTokenHash(ShareTokens.hash(created.token())).orElseThrow();
         assertThat(afterSuccess.getFailedPasswordAttempts()).isZero();
         assertThat(afterSuccess.getRemainingDownloads()).isEqualTo(1);
     }
@@ -284,7 +284,7 @@ class SecureShareServiceTest {
                     .isInstanceOf(SharePasswordException.class);
         }
 
-        assertThat(repository.count()).isZero();
+        assertThat(store.size()).isZero();
         assertThatThrownBy(() -> service.retrieve(created.token(), "password1", ip))
                 .isInstanceOf(ShareNotAvailableException.class);
     }
