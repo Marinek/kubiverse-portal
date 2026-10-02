@@ -13,10 +13,6 @@ services:
     environment:
       - ARGOCD_URL=http://mock:12004
       - SPRING_PROFILES_ACTIVE=no-db
-      - BITBUCKET_API_URL=${BITBUCKET_API_URL:-http://mock:12004/rest/api/1.0}
-      - BITBUCKET_PROJECT=${BITBUCKET_PROJECT:-FMS}
-      - BITBUCKET_TEMPLATE_REPO=${BITBUCKET_TEMPLATE_REPO:-http://mock:12004/scm/fms/template.git}
-      - BITBUCKET_TOKEN=${BITBUCKET_TOKEN:-mock-token}
     ports:
       - "8080:8080"
     depends_on:
