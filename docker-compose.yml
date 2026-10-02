@@ -4,6 +4,8 @@ services:
       context: ./mock
     ports:
       - "12004:12004"
+    networks:
+      - kubiverse
     restart: unless-stopped
 
   server:
@@ -12,11 +14,19 @@ services:
       dockerfile: Dockerfile
     environment:
       - ARGOCD_URL=http://mock:12004
-      - SPRING_PROFILES_ACTIVE=no-db
+      - SECURE_SHARE_MASTER_KEY=${SECURE_SHARE_MASTER_KEY:?SECURE_SHARE_MASTER_KEY muss gesetzt sein, z. B. in .env (openssl rand -base64 32)}
+      - SECURE_SHARE_MASTER_KEY_ID=${SECURE_SHARE_MASTER_KEY_ID:-k1}
+      - SECURE_SHARE_PREVIOUS_MASTER_KEY=${SECURE_SHARE_PREVIOUS_MASTER_KEY:-}
+      - SECURE_SHARE_PREVIOUS_MASTER_KEY_ID=${SECURE_SHARE_PREVIOUS_MASTER_KEY_ID:-}
+      # Only the portal's nginx may set X-Forwarded-For
+      - SECURE_SHARE_TRUSTED_PROXIES=172\.28\.0\.10
     ports:
       - "8080:8080"
     depends_on:
-      - mock
+      mock:
+        condition: service_started
+    networks:
+      - kubiverse
     restart: unless-stopped
 
   orchestrator:
@@ -77,3 +87,9 @@ services:
     environment:
       - JENKINS_OPTS=--prefix=/jenkins
     restart: unless-stopped
+
+networks:
+  kubiverse:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24

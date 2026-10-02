@@ -1,23 +1,20 @@
 server:
   port: 8080
+  forward-headers-strategy: native
+  tomcat:
+    # Lets Tomcat drain oversized uploads so clients receive the 413 response
+    max-swallow-size: 12MB
+    remoteip:
+      # Regex of proxy addresses whose X-Forwarded-For header is trusted
+      internal-proxies: ${SECURE_SHARE_TRUSTED_PROXIES:127\.0\.0\.1|0:0:0:0:0:0:0:1}
 
 spring:
   application:
     name: Kubiverse Portal
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:no-db}
-  datasource:
-    url: jdbc:postgresql://localhost:12002/kubiverse-portal
-    username: root
-    password: rootpassword
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
 
 jwt:
   secret: aVeryStrongSecretKeyThatShouldBeAtLeastThirtyTwoBytesLongForHS256
@@ -27,12 +24,14 @@ argocd:
   url: ${ARGOCD_URL:http://localhost:12004}
   api-key: ${ARGOCD_API_KEY:mock-token}
 
----
-spring:
-  config:
-    activate:
-      on-profile: "no-db"
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+secure-share:
+  master-key: ${SECURE_SHARE_MASTER_KEY:}
+  master-key-id: ${SECURE_SHARE_MASTER_KEY_ID:k1}
+  previous-master-key: ${SECURE_SHARE_PREVIOUS_MASTER_KEY:}
+  previous-master-key-id: ${SECURE_SHARE_PREVIOUS_MASTER_KEY_ID:}
+  rate-limit:
+    create-per-hour: ${SECURE_SHARE_RATE_LIMIT_CREATE_PER_HOUR:20}
+    access-per-hour: ${SECURE_SHARE_RATE_LIMIT_ACCESS_PER_HOUR:60}
+  capacity:
+    max-shares: ${SECURE_SHARE_MAX_SHARES:1000}
+    max-total-bytes: ${SECURE_SHARE_MAX_TOTAL_BYTES:268435456}

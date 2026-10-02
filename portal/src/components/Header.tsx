@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { LayoutGrid } from "lucide-react";
+import { LayoutGrid, ShieldCheck } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export const Header = () => {
@@ -44,7 +44,13 @@ export const Header = () => {
             </a>
           </nav>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <Link to="/secure-share">
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm">
+                <ShieldCheck className="w-4 h-4 mr-2" />
+                Secure Share
+              </Button>
+            </Link>
             <Link to="/argocd">
               <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm">
                 <LayoutGrid className="w-4 h-4 mr-2" />
