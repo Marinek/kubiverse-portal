@@ -51,6 +51,14 @@ export const Header = () => {
                 Application Hub
               </Button>
             </Link>
+            {import.meta.env.VITE_ARGOCD_UI_URL && (
+              <a href={import.meta.env.VITE_ARGOCD_UI_URL} target="_blank" rel="noopener noreferrer">
+                <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm">
+                  <img src="https://argo-cd.readthedocs.io/en/stable/assets/logo.png" alt="ArgoCD" className="w-4 h-4 mr-2 object-contain" />
+                  ArgoCD
+                </Button>
+              </a>
+            )}
           </div>
         </div>
       </div>
