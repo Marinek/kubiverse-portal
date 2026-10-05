@@ -47,12 +47,14 @@ services:
     depends_on:
       - gitea
       - jenkins
+    networks:
+      - kubiverse
     restart: unless-stopped
 
   portal:
     build:
-      context: ./portal
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: portal/dockerfile
       args:
         - VITE_ARGOCD_UI_URL=http://localhost:12004
         - VITE_TEAMS_CHAT_URL=https://example.com
@@ -66,6 +68,9 @@ services:
       - mock
       - server
       - orchestrator
+    networks:
+      kubiverse:
+        ipv4_address: 172.28.0.10
     restart: unless-stopped
 
   gitea:
@@ -77,6 +82,8 @@ services:
     ports:
       - "3000:3000"
       - "2222:22"
+    networks:
+      - kubiverse
 
   jenkins:
     image: jenkins/jenkins:lts
@@ -86,6 +93,8 @@ services:
       - "50000:50000"
     environment:
       - JENKINS_OPTS=--prefix=/jenkins
+    networks:
+      - kubiverse
     restart: unless-stopped
 
 networks:
