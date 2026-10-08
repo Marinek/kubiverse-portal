@@ -7,7 +7,7 @@ Beschreibt das im Code umgesetzte Sicherheitskonzept von Backend, Portal (nginx/
 **Umgesetzte Bausteine:**
 
 - Spring Security mit zustandsloser Session-Verwaltung und JWT-Filter (`SecurityConfig`, `JwtAuthenticationFilter`, `JwtTokenUtil`, `CustomUserDetailsService`)
-- Bearer-Token-Authentifizierung gegenüber ArgoCD und Bitbucket, Token-Authentifizierung für Git (JGit)
+- Bearer-Token-Authentifizierung gegenüber ArgoCD
 - Fehlerbehandlung ohne Stacktraces nach außen (`GlobalExceptionHandler`)
 - nginx-Härtung (`server_tokens off`, Sicherheitsheader inklusive Content-Security-Policy auf allen Antworten über `security-headers.conf`)
 - Externe Links im Frontend mit `rel="noopener noreferrer"`
@@ -17,10 +17,9 @@ Beschreibt das im Code umgesetzte Sicherheitskonzept von Backend, Portal (nginx/
 
 - Es sind keine URL- oder Methoden-Autorisierungsregeln konfiguriert (`authorizeHttpRequests` fehlt, keine `@PreAuthorize`-Annotationen); alle Endpunkte sind ohne Authentifizierung aufrufbar.
 - Es existiert kein Endpunkt, der JWTs ausstellt (`JwtTokenUtil.generateToken` wird nicht aufgerufen); das Frontend sendet keine Tokens.
-- `jwt.secret` steht im Klartext in `application.yml`; für Datenbank-Zugangsdaten sind dort lokale Standardwerte hinterlegt (per `DB_*` überschreibbar); Token-Standardwerte lauten `mock-token` bzw. `mock-key-12345`.
+- `jwt.secret` steht im Klartext in `application.yml`; für Datenbank-Zugangsdaten sind dort lokale Standardwerte hinterlegt (per `DB_*` überschreibbar); der ArgoCD-Token hat den Standardwert `mock-token` (im Backend-Image `mock-key-12345`).
 - Der einzige Benutzer (`admin`) ist fest im Code hinterlegt.
 - CORS ist im Backend deaktiviert (Kommentar: "Consider specific cors config for production"); im Mock ist CORS für alle Ursprünge aktiv.
-- Der Bootstrap-Endpunkt gibt Exception-Meldungen an den Client zurück; `projectName` wird außer auf Nicht-Leere nicht validiert.
 - Die Content-Security-Policy erlaubt `'unsafe-inline'` für Styles (Inline-Styles in bestehenden Komponenten).
 - Der Header lädt das ArgoCD-Logo von einer externen URL (`argo-cd.readthedocs.io`).
 
@@ -64,15 +63,15 @@ Der `CustomUserDetailsService` SHALL ausschließlich den Benutzer `admin` mit BC
 Das Backend SHALL derzeit keine Autorisierungsregeln erzwingen; die Endpunkte unter `/kubiverse/api/` sind ohne Token erreichbar.
 
 #### Scenario: Aufruf ohne Token
-- **WHEN** `GET /kubiverse/api/argocd/applications` oder `POST /kubiverse/api/bootstrap` ohne `Authorization`-Header aufgerufen wird
+- **WHEN** `GET /kubiverse/api/argocd/applications` ohne `Authorization`-Header aufgerufen wird
 - **THEN** wird die Anfrage verarbeitet und nicht mit 401/403 abgewiesen
 
 ### Requirement: Authentifizierung gegenüber Fremdsystemen
-Das Backend SHALL ausgehende Aufrufe authentifizieren: ArgoCD per `Authorization: Bearer {argocd.api-key}`, Bitbucket REST per `Authorization: Bearer {bitbucket.token}` und Git-Clone/-Push per Benutzer `x-token-auth` mit Passwort `{bitbucket.token}`. Die Zugangsdaten MUST über Konfiguration bzw. Umgebungsvariablen (`ARGOCD_API_KEY`, `BITBUCKET_TOKEN`) setzbar sein.
+Das Backend SHALL ausgehende Aufrufe an ArgoCD per `Authorization: Bearer {argocd.api-key}` authentifizieren. Der API-Schlüssel MUST über die Umgebungsvariable `ARGOCD_API_KEY` setzbar sein.
 
 #### Scenario: Token per Umgebungsvariable
-- **WHEN** `ARGOCD_API_KEY` bzw. `BITBUCKET_TOKEN` gesetzt sind
-- **THEN** verwendet das Backend diese Werte statt der Standardwerte
+- **WHEN** `ARGOCD_API_KEY` gesetzt ist
+- **THEN** verwendet das Backend diesen Wert statt des Standardwerts
 
 ### Requirement: Keine Preisgabe interner Fehlerdetails
 Der `GlobalExceptionHandler` SHALL bei unerwarteten Fehlern nur generische Meldungen an den Client liefern und Details ausschließlich serverseitig loggen. Die Meldung einer `ArgoCdIntegrationException` MUST NOT an den Client gelangen.

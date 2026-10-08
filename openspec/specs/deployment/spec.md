@@ -11,10 +11,6 @@ Beschreibt Build, Konfiguration und Betrieb von Portal, Backend und Mock über D
 | `server.port` | – | `8080` |
 | `argocd.url` | `ARGOCD_URL` | `http://localhost:12004` |
 | `argocd.api-key` | `ARGOCD_API_KEY` | `mock-token` |
-| `bitbucket.api-url` | `BITBUCKET_API_URL` | `http://localhost:7990/rest/api/1.0` |
-| `bitbucket.project` | `BITBUCKET_PROJECT` | `FMS` |
-| `bitbucket.template-repo-url` | `BITBUCKET_TEMPLATE_REPO` | `http://localhost:7990/scm/fms/template.git` |
-| `bitbucket.token` | `BITBUCKET_TOKEN` | `mock-token` |
 | `jwt.secret` | – | im Klartext in `application.yml` |
 | `jwt.expiration` | – | `86400000` (24 h) |
 | `spring.servlet.multipart.max-file-size` / `max-request-size` | – | `10MB` / `11MB` |
@@ -35,7 +31,6 @@ Das Repository SHALL eine `docker-compose.yml` bereitstellen, die `mock` (Port 1
 - **WHEN** `docker-compose up -d --build` (oder `podman compose up -d --build`) ausgeführt wird
 - **THEN** ist das Portal unter `http://localhost`, das Backend unter `http://localhost:8080` und der Mock unter `http://localhost:12004` erreichbar
 - **AND** der Server verwendet `ARGOCD_URL=http://mock:12004`
-- **AND** `BITBUCKET_*` sind per Host-Umgebung überschreibbar und zeigen standardmäßig auf den Mock
 - **AND** `server` startet nach `mock`
 - **AND** es wird kein PostgreSQL-Container gestartet
 

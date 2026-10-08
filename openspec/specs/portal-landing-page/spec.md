@@ -57,7 +57,7 @@ Der Abschnitt `kubiverse` SHALL die Plattform beschreiben und sechs Feature-Kart
 - **THEN** werden die sechs Feature-Karten als Raster dargestellt
 
 ### Requirement: Abschnitt "Projekt veröffentlichen"
-Der Abschnitt `deployment` SHALL eine Anleitung in fünf Schritten anzeigen: 01 Neues Projekt in Bitbucket anlegen, 02 Branch pushen, 03 CI/CD-Pipeline automatisch ausgelöst, 04 Deployment in eigenem Namespace, 05 Zugriff über generierte URL. Schritt 01 MUST das Formular zur Projektinitialisierung enthalten (siehe `project-bootstrap`).
+Der Abschnitt `deployment` SHALL eine Anleitung in fünf Schritten anzeigen: 01 Projekt in Bitbucket anlegen, 02 Branch pushen, 03 CI/CD-Pipeline automatisch ausgelöst, 04 Deployment in eigenem Namespace, 05 Zugriff über generierte URL.
 
 #### Scenario: Anzeige der Schritte
 - **WHEN** die Startseite geladen wird
@@ -65,7 +65,7 @@ Der Abschnitt `deployment` SHALL eine Anleitung in fünf Schritten anzeigen: 01 
 
 #### Scenario: Button "Deployment starten"
 - **WHEN** der Nutzer den Button `Deployment starten` klickt
-- **THEN** erfolgt keine Aktion (kein Handler im Code hinterlegt)
+- **THEN** öffnet sich der Projektinitialisierungs-Wizard
 
 ### Requirement: Abschnitt "Dokumentation & Hilfe"
 Der Abschnitt `documentation` SHALL vier Dokumentationslinks (Deployment-Guide, Git-Konventionen, CI/CD Pipeline-Konfiguration, Troubleshooting mit Badge `Wichtig`) sowie eine Support-Karte `DevOps-Team` mit Mail-Kontakt anzeigen.

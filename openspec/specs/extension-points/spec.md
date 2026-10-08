@@ -6,7 +6,7 @@ Dokumentiert die im Code vorhandenen Stellen, an denen das System konfiguriert o
 
 | Erweiterungspunkt | Ort | Stand im Code |
 |---|---|---|
-| Externe Systeme per Konfiguration | `application.yml` (`argocd.*`, `bitbucket.*`), `ArgoCdProperties` | aktiv |
+| Externe Systeme per Konfiguration | `application.yml` (`argocd.*`), `ArgoCdProperties` | aktiv |
 | Secure-Share-Grenzwerte und Schlüssel | `application.yml` (`secure-share.*`), `SecureShareProperties` | aktiv |
 | Frontend-Links per Build-Argument | `VITE_*` in `portal/dockerfile`, `Header`, `DocumentationSection` | aktiv |
 | Datenbank (PostgreSQL/JPA) | `build.gradle`, `spring.datasource`/`spring.jpa` in `application.yml` | aktiv für Secure Share (Entität `SecureShare`), um weitere Entitäten erweiterbar |
@@ -25,15 +25,11 @@ Dokumentiert die im Code vorhandenen Stellen, an denen das System konfiguriert o
 ## Requirements
 
 ### Requirement: Konfigurierbare Integrationsziele
-Das Backend SHALL die Ziele und Zugangsdaten der ArgoCD- und Bitbucket-Integration ausschließlich über Spring-Properties bzw. Umgebungsvariablen beziehen, sodass ein Wechsel vom Mock auf echte Systeme ohne Codeänderung möglich ist.
+Das Backend SHALL das Ziel und die Zugangsdaten der ArgoCD-Integration ausschließlich über Spring-Properties bzw. Umgebungsvariablen beziehen, sodass ein Wechsel vom Mock auf ein echtes System ohne Codeänderung möglich ist.
 
 #### Scenario: Umstellung auf echtes ArgoCD
 - **WHEN** `ARGOCD_URL` und `ARGOCD_API_KEY` auf eine echte ArgoCD-Instanz gesetzt werden
 - **THEN** ruft das Backend deren `/api/v1/applications` auf und bildet `argocdUrl` auf Basis dieser URL
-
-#### Scenario: Umstellung auf echtes Bitbucket
-- **WHEN** `BITBUCKET_API_URL`, `BITBUCKET_PROJECT`, `BITBUCKET_TEMPLATE_REPO` und `BITBUCKET_TOKEN` gesetzt werden
-- **THEN** legt das Backend Repositories im angegebenen Bitbucket-Projekt an und verwendet das angegebene Template
 
 ### Requirement: Konfigurierbare Frontend-Links
 Das Portal SHALL ArgoCD-UI-Link, Teams-Chat-Link und die vier Dokumentationslinks über die Build-Argumente `VITE_ARGOCD_UI_URL`, `VITE_TEAMS_CHAT_URL`, `VITE_DOCS_DEPLOYMENT_GUIDE_URL`, `VITE_DOCS_GIT_CONVENTIONS_URL`, `VITE_DOCS_CICD_PIPELINE_URL` und `VITE_DOCS_TROUBLESHOOTING_URL` konfigurierbar machen.
